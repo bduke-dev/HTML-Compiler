@@ -37,27 +37,28 @@ public class HTMLReader {
         return returnString;
     }
 
-    private String[] getDynamicHTML(){
-        String[] returnString, directories;
 
-        File folder = new File("");//TODO make not static
-        File[] listOfFiles = folder.listFiles();
+    private void getDynamicHTML(File[] listOfFiles){
 
         for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isFile()) {
                 System.out.println("File " + listOfFiles[i].getName());
             } else if (listOfFiles[i].isDirectory()) {
                 System.out.println("Directory " + listOfFiles[i].getName());
+                getDynamicHTML(listOfFiles[i].listFiles());
             }
         }
 
-
-
-
-        return returnString;
     }
 
     public boolean compileHTML(){
+
+        String[] returnString, directories;
+
+        File folder = new File("src/files/PARTs_Website");//TODO make not static
+        File[] listOfFiles = folder.listFiles();
+
+        getDynamicHTML(listOfFiles);
 
         return true;
     }
