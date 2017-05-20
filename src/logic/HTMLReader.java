@@ -11,11 +11,11 @@ import java.util.Scanner;
  * @version 5/18/17
  */
 public class HTMLReader {
-    private String headerHTML, footerHTML, pathHTML;
+    private String navHTML, footerHTML, pathHTML;
     private Scanner scanner;
 
-    public HTMLReader(String headerHTML, String footerHTML, String pathHTML){
-        this.headerHTML = headerHTML;
+    public HTMLReader(String navHTML, String footerHTML, String pathHTML){
+        this.navHTML = navHTML;
         this.footerHTML = footerHTML;
         this.pathHTML = pathHTML;
     }
@@ -95,10 +95,48 @@ public class HTMLReader {
 
     public boolean compileHTML(){
         HTMLFile[] htmlFiles = getProject(new File(pathHTML).listFiles()); //all chosen html files
-        String header = readHTML(headerHTML), footer = readHTML(footerHTML); //header and footer html file
+        String header = readHTML(navHTML), footer = readHTML(footerHTML); //nav and footer html file
 
         for (int i = 0; i < htmlFiles.length; i++){
+            String[] lines = htmlFiles[i].getHtml().split("\n"); //turn into array to null indices that are in the nav or footer if it exists
 
+            int j = 0;
+            //removes nav if it exists
+            for (; j < lines.length; j++){
+                if (lines[j].contains("<nav")){
+                    while (!lines[j].contains("</nav>")){
+                        lines[j++] = null;
+                    }
+                    lines[j++] = null; //catches the last line the while loop doesn't get
+                    break;
+                }
+            }
+
+            //removes footer if it exists
+            for (; j < lines.length; j++){
+                if (lines[j].contains("<footer")){
+                    while (!lines[j].contains("</footer>")){
+                        lines[j++] = null;
+                    }
+                    lines[j++] = null; //catches the last line the while loop doesn't get
+                    break;
+                }
+            }
+
+            //remove null spaces
+            String[] temp = lines;
+            lines = new String[0];
+            int index = 0;
+            for (int k = 0; k < temp.length; k++){
+                if (temp[k] != null){
+                    lines = Arrays.copyOf(lines, lines.length + 1);
+                    lines[index++] = temp[k];
+                }
+            }
+
+            //add the nav and footer
+
+            for (String s : lines) System.out.println(s);
         }
 
         return true;

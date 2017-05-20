@@ -5,7 +5,7 @@ package logic;
  * @version 5/19/17
  */
 public class HTMLFile {
-    String html, path;
+    private String html, path;
 
     public HTMLFile(String html, String path){
         this.html = html;
@@ -18,5 +18,9 @@ public class HTMLFile {
 
     public String getPath() {
         return path;
+    }
+
+    public void appendHtml(String html) {
+        this.html = html;
     }
 }
