@@ -11,24 +11,24 @@ import java.util.Scanner;
  * @version 5/18/17
  */
 public class HTMLReader {
-    private String navHTML, footerHTML, pathHTML;
+    private File navHTML, footerHTML, pathHTML;
     private Scanner scanner;
 
     public HTMLReader(String navHTML, String footerHTML, String pathHTML){
-        this.navHTML = navHTML;
-        this.footerHTML = footerHTML;
-        this.pathHTML = pathHTML;
+        this.navHTML = new File(navHTML);
+        this.footerHTML = new File(footerHTML);
+        this.pathHTML = new File(pathHTML);
     }
 
-    private String readHTML(String path){
+    private String readHTML(File path){
         String returnString = "";
 
         try{
             //read in the html
-            scanner = new Scanner(new File(path));
+            scanner = new Scanner(path);
             while (scanner.hasNextLine()) returnString += scanner.nextLine() + "\n";
         }
-        catch (FileNotFoundException fnfe){ fnfe.printStackTrace();}
+        catch (FileNotFoundException fnfe){fnfe.printStackTrace();}
 
         return returnString;
     }
@@ -87,13 +87,13 @@ public class HTMLReader {
 
         //get the file and path
         HTMLFile[] htmlFiles = new HTMLFile[listOfFiles.length];
-        for (int i = 0; i < htmlFiles.length; i++) htmlFiles[i] = new HTMLFile(readHTML(listOfFiles[i].getAbsolutePath()), listOfFiles[i].getAbsolutePath());
+        for (int i = 0; i < htmlFiles.length; i++) htmlFiles[i] = new HTMLFile(readHTML(listOfFiles[i]), listOfFiles[i]);
 
         return htmlFiles;
     }
 
     private HTMLFile[] compileHTML(){
-        HTMLFile[] htmlFiles = getProject(new File(pathHTML).listFiles()); //all chosen html files
+        HTMLFile[] htmlFiles = getProject(pathHTML.listFiles()); //all chosen html files
         String nav = readHTML(navHTML), footer = readHTML(footerHTML); //nav and footer html file
 
         for (int i = 0; i < htmlFiles.length; i++){
@@ -143,13 +143,22 @@ public class HTMLReader {
                     compiled += footer;
                 }
             }
-
             htmlFiles[i].appendHtml(compiled);
         }
-
         return htmlFiles;
     }
 
+    public boolean writeHTML(){
+        boolean success = false;
 
+        HTMLFile[] htmlFiles = compileHTML();
+
+        for (HTMLFile h : htmlFiles) System.out.println(h.getFile().getAbsolutePath());
+
+
+
+
+        return success;
+    }
 
 }

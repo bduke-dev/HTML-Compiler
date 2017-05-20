@@ -14,6 +14,6 @@ public class Test {
         footerHTML = "src/files/footer.html";
         pathHTML = "src/files/PARTs_Website";
         HTMLReader htmlReader = new HTMLReader(navHTML, footerHTML, pathHTML);
-        htmlReader.compileHTML();
+        htmlReader.writeHTML();
     }
 }
