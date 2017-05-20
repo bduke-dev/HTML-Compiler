@@ -33,23 +33,32 @@ public class HTMLReader {
     }
 
 
-    private HTMLFile[] getDynamicHTML(File[] listOfFiles, HTMLFile[] htmlFiles, int counter){
+    private File[] getDynamicHTML(File[] listOfFiles, HTMLFile[] htmlFiles, int counter){
 
         boolean done = false;
         counter = 0;
 
-        while (!done){
-            done = true;
-
+        while (counter < listOfFiles.length){
             if (listOfFiles[counter].isDirectory()){
                 File[] temp = listOfFiles[counter].listFiles();
-                //remoce this inxex, add all on at the end
+                //remove this index
+                listOfFiles[counter] = null;
+                File[] frontHalf = Arrays.copyOfRange(listOfFiles, 0, counter);
+                File[] backHalf = Arrays.copyOfRange(listOfFiles, counter + 1, listOfFiles.length);
 
+                //merge them back together
+                System.arraycopy(frontHalf, 0, listOfFiles, 0, frontHalf.length);
+                System.arraycopy(backHalf, 0, listOfFiles, frontHalf.length + 1, backHalf.length);
+
+                //expand temp and tak on the end
+                int index = listOfFiles.length;
+                for (File aTemp : temp) {
+                    listOfFiles = Arrays.copyOf(listOfFiles, listOfFiles.length + 1);
+                    listOfFiles[index++] = aTemp;
+                }
             }
 
-
-
-            counter++
+            counter++;
         }
 
         /*for (int i = 0; i < listOfFiles.length; i++) {
@@ -69,7 +78,7 @@ public class HTMLReader {
 
         }*/
 
-        return htmlFiles;
+        return listOfFiles;
     }
 
     private File searchFolder(File[] listOfFiles){
@@ -93,11 +102,11 @@ public class HTMLReader {
         File folder = new File("src/files/PARTs_Website");//TODO make not static
         File[] listOfFiles = folder.listFiles();
 
-        htmlFiles = getDynamicHTML(listOfFiles, htmlFiles, 0);
+        File[] files = getDynamicHTML(listOfFiles, htmlFiles, 0);
 
-        for(HTMLFile h : htmlFiles) {
+        for(File h : files) {
             if (h != null) {
-                System.out.println("Directory: " + h.getPath());
+                System.out.println("Directory: " + h.getAbsolutePath());
                 //System.out.println("HTML\n" + h.getHtml());
             }
         }
