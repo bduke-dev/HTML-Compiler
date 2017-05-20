@@ -11,8 +11,8 @@ import java.util.Scanner;
  * @version 5/18/17
  */
 public class HTMLReader {
-    String headerHTML, footerHTML, pathHTML;
-    Scanner scanner;
+    private String headerHTML, footerHTML, pathHTML;
+    private Scanner scanner;
 
     public HTMLReader(String headerHTML, String footerHTML, String pathHTML){
         this.headerHTML = headerHTML;
@@ -34,7 +34,7 @@ public class HTMLReader {
     }
 
 
-    private HTMLFile[] getDynamicHTML(File[] listOfFiles){
+    private HTMLFile[] getProject(File[] listOfFiles){
         int counter = 0, index;
         File[] temp;
 
@@ -94,19 +94,12 @@ public class HTMLReader {
     }
 
     public boolean compileHTML(){
-        String folderPath = "src/files/PARTs_Website";
-        File folder = new File(folderPath);//TODO make not static
-        File[] listOfFiles = folder.listFiles();
+        HTMLFile[] htmlFiles = getProject(new File(pathHTML).listFiles()); //all chosen html files
+        String header = readHTML(headerHTML), footer = readHTML(footerHTML); //header and footer html file
 
-        HTMLFile[] htmlFiles = getDynamicHTML(listOfFiles);
+        for (int i = 0; i < htmlFiles.length; i++){
 
-        for(HTMLFile h : htmlFiles) {
-            if (h != null) {
-                System.out.println("Directory: " + h.getPath());
-                //System.out.println("HTML\n" + h.getHtml());
-            }
         }
-
 
         return true;
     }

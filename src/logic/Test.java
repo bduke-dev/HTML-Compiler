@@ -12,7 +12,8 @@ public class Test {
         String headerHTML, footerHTML, pathHTML;
         headerHTML = "src/files/header.html";
         footerHTML = "src/files/footer.html";
-        HTMLReader htmlReader = new HTMLReader(headerHTML, footerHTML, " ");
+        pathHTML = "src/files/PARTs_Website";
+        HTMLReader htmlReader = new HTMLReader(headerHTML, footerHTML, pathHTML);
         htmlReader.compileHTML();
     }
 }
