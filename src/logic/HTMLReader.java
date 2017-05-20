@@ -2,6 +2,8 @@ package logic;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -152,8 +154,14 @@ public class HTMLReader {
         boolean success = false;
 
         HTMLFile[] htmlFiles = compileHTML();
-
-        for (HTMLFile h : htmlFiles) System.out.println(h.getFile().getAbsolutePath());
+        FileWriter fileWriter;
+        for (HTMLFile h : htmlFiles) {
+            try {
+                fileWriter = new FileWriter(h.getFile().getAbsoluteFile());
+                fileWriter.write(h.getHtml());
+                fileWriter.close();
+            } catch (IOException e) {e.printStackTrace();}
+        }
 
 
 
