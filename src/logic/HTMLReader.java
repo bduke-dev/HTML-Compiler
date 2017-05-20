@@ -34,20 +34,17 @@ public class HTMLReader {
     }
 
 
-    private HTMLFile[] getDynamicHTML(File[] listOfFiles, String folderPath){
+    private HTMLFile[] getDynamicHTML(File[] listOfFiles){
         int counter = 0, index;
         File[] temp;
 
         for (int i = 0; i < listOfFiles.length; i++){
-            //System.out.println("LOOKING" + listOfFiles[counter].getPath());
             //null .git, .sass-cache, css, scss, sass //TODO make so user can specify
             if (listOfFiles[counter] != null) {
-                ArrayList<String> ignored = new ArrayList<>(Arrays.asList("/.git", "/.sass-cache", "/css", "/scss", "/sass", "/DEV FILES", "/google071d8247f50df527.html"));
-                String path = listOfFiles[i].getPath();
+                ArrayList<String> ignored = new ArrayList<>(Arrays.asList(".git", ".sass-cache", "css", "scss", "sass", "DEV FILES", "google071d8247f50df527.html"));
+                String path = listOfFiles[i].getName();
 
-                //remove path to directory sec/files/otherPath becomes /otherPath
-                path = path.replace(folderPath, "");
-                //System.out.println("NEW: " + path);
+                //null ignored files and directories in root project
                 if (ignored.contains(path)) listOfFiles[i] = null;
             }
         }
@@ -78,7 +75,7 @@ public class HTMLReader {
             }
         }
 
-        //remove null spaces TODO eventually will remove not html files
+        //remove null spaces
         temp = listOfFiles;
         listOfFiles = new File[0];
         index = 0;
@@ -101,7 +98,7 @@ public class HTMLReader {
         File folder = new File(folderPath);//TODO make not static
         File[] listOfFiles = folder.listFiles();
 
-        HTMLFile[] htmlFiles = getDynamicHTML(listOfFiles, folderPath);
+        HTMLFile[] htmlFiles = getDynamicHTML(listOfFiles);
 
         for(HTMLFile h : htmlFiles) {
             if (h != null) {
