@@ -33,7 +33,6 @@ public class HTMLReader {
         return returnString;
     }
 
-
     private HTMLFile[] getProject(File[] listOfFiles){
         int counter = 0, index;
         File[] temp;
@@ -93,9 +92,9 @@ public class HTMLReader {
         return htmlFiles;
     }
 
-    public boolean compileHTML(){
+    private HTMLFile[] compileHTML(){
         HTMLFile[] htmlFiles = getProject(new File(pathHTML).listFiles()); //all chosen html files
-        String header = readHTML(navHTML), footer = readHTML(footerHTML); //nav and footer html file
+        String nav = readHTML(navHTML), footer = readHTML(footerHTML); //nav and footer html file
 
         for (int i = 0; i < htmlFiles.length; i++){
             String[] lines = htmlFiles[i].getHtml().split("\n"); //turn into array to null indices that are in the nav or footer if it exists
@@ -135,11 +134,22 @@ public class HTMLReader {
             }
 
             //add the nav and footer
+            String compiled = "";
+            for (int k = 0; k < lines.length; k++){
+                compiled += lines[k] + "\n";
+                if (lines[k].contains("<body id=\"top\">")) compiled += nav;
+                if (lines[k].contains("</main>")){
+                    compiled += lines[k++]  + "\n"; //this is because there is a closing div right after main's closing then the footer goes there
+                    compiled += footer;
+                }
+            }
 
-            for (String s : lines) System.out.println(s);
+            htmlFiles[i].appendHtml(compiled);
         }
 
-        return true;
+        return htmlFiles;
     }
+
+
 
 }
