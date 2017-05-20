@@ -2,6 +2,7 @@ package logic;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -33,11 +34,26 @@ public class HTMLReader {
     }
 
 
-    private HTMLFile[] getDynamicHTML(File[] listOfFiles){
+    private HTMLFile[] getDynamicHTML(File[] listOfFiles, String folderPath){
         int counter = 0, index;
         File[] temp;
+
+        for (int i = 0; i < listOfFiles.length; i++){
+            //System.out.println("LOOKING" + listOfFiles[counter].getPath());
+            //null .git, .sass-cache, css, scss, sass //TODO make so user can specify
+            if (listOfFiles[counter] != null) {
+                ArrayList<String> ignored = new ArrayList<>(Arrays.asList("/.git", "/.sass-cache", "/css", "/scss", "/sass", "/DEV FILES", "/google071d8247f50df527.html"));
+                String path = listOfFiles[i].getPath();
+
+                //remove path to directory sec/files/otherPath becomes /otherPath
+                path = path.replace(folderPath, "");
+                //System.out.println("NEW: " + path);
+                if (ignored.contains(path)) listOfFiles[i] = null;
+            }
+        }
+
         while (counter < listOfFiles.length){
-            if (listOfFiles[counter].isDirectory()){
+            if (listOfFiles[counter] != null && listOfFiles[counter].isDirectory()){
                 temp = listOfFiles[counter].listFiles();
 
                 //null this index
@@ -51,6 +67,15 @@ public class HTMLReader {
                 }
             }
             counter++;
+        }
+
+        //null not html files
+        for (int i = 0; i < listOfFiles.length; i++){
+            if (listOfFiles[i] != null) {// only check not currently null spaces
+                String path = listOfFiles[i].getAbsolutePath();
+                path = path.substring(path.length() - 5, path.length());
+                if (!path.equals(".html")) listOfFiles[i] = null;
+            }
         }
 
         //remove null spaces TODO eventually will remove not html files
@@ -72,11 +97,11 @@ public class HTMLReader {
     }
 
     public boolean compileHTML(){
-
-        File folder = new File("src/files/PARTs_Website");//TODO make not static
+        String folderPath = "src/files/PARTs_Website";
+        File folder = new File(folderPath);//TODO make not static
         File[] listOfFiles = folder.listFiles();
 
-        HTMLFile[] htmlFiles = getDynamicHTML(listOfFiles);
+        HTMLFile[] htmlFiles = getDynamicHTML(listOfFiles, folderPath);
 
         for(HTMLFile h : htmlFiles) {
             if (h != null) {
