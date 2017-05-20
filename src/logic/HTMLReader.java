@@ -33,80 +33,54 @@ public class HTMLReader {
     }
 
 
-    private File[] getDynamicHTML(File[] listOfFiles, HTMLFile[] htmlFiles, int counter){
-
-        boolean done = false;
-        counter = 0;
-
+    private HTMLFile[] getDynamicHTML(File[] listOfFiles){
+        int counter = 0, index;
+        File[] temp;
         while (counter < listOfFiles.length){
             if (listOfFiles[counter].isDirectory()){
-                File[] temp = listOfFiles[counter].listFiles();
-                //remove this index
-                listOfFiles[counter] = null;
-                File[] frontHalf = Arrays.copyOfRange(listOfFiles, 0, counter);
-                File[] backHalf = Arrays.copyOfRange(listOfFiles, counter + 1, listOfFiles.length);
+                temp = listOfFiles[counter].listFiles();
 
-                //merge them back together
-                System.arraycopy(frontHalf, 0, listOfFiles, 0, frontHalf.length);
-                System.arraycopy(backHalf, 0, listOfFiles, frontHalf.length + 1, backHalf.length);
+                //null this index
+                listOfFiles[counter] = null;
 
                 //expand temp and tak on the end
-                int index = listOfFiles.length;
+                index = listOfFiles.length;
                 for (File aTemp : temp) {
                     listOfFiles = Arrays.copyOf(listOfFiles, listOfFiles.length + 1);
                     listOfFiles[index++] = aTemp;
                 }
             }
-
             counter++;
         }
 
-        /*for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile()) {
-                System.out.println("File " + listOfFiles[i].getName());
-
-                htmlFiles = Arrays.copyOf(htmlFiles, htmlFiles.length + 1);
-                htmlFiles[i] = new HTMLFile(readHTML(listOfFiles[i].getAbsolutePath()), listOfFiles[i].getAbsolutePath());
-
-            } else if (listOfFiles[i].isDirectory()) {
-                System.out.println("Directory " + listOfFiles[i].getName());
-                htmlFiles = Arrays.copyOf(htmlFiles, htmlFiles.length + 1);
-                getDynamicHTML(listOfFiles[i].listFiles(), htmlFiles, counter++);
-                //File f = searchFolder(listOfFiles[i].listFiles());
-                //htmlFiles[i] = new HTMLFile(readHTML(f.getAbsolutePath()), f.getAbsolutePath());
-            }
-
-        }*/
-
-        return listOfFiles;
-    }
-
-    private File searchFolder(File[] listOfFiles){
-        File f = null;
-        for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile()) {
-                System.out.println("File " + listOfFiles[i].getName());
-                f = listOfFiles[i];
-            } else if (listOfFiles[i].isDirectory()) {
-                System.out.println("Directory " + listOfFiles[i].getName());
-                f = searchFolder(listOfFiles);
+        //remove null spaces TODO eventually will remove not html files
+        temp = listOfFiles;
+        listOfFiles = new File[0];
+        index = 0;
+        for (int i = 0; i < temp.length; i++){
+            if (temp[i] != null){
+                listOfFiles = Arrays.copyOf(listOfFiles, listOfFiles.length + 1);
+                listOfFiles[index++] = temp[i];
             }
         }
-        return f;
+
+        //get the file and path
+        HTMLFile[] htmlFiles = new HTMLFile[listOfFiles.length];
+        for (int i = 0; i < htmlFiles.length; i++) htmlFiles[i] = new HTMLFile(readHTML(listOfFiles[i].getAbsolutePath()), listOfFiles[i].getAbsolutePath());
+
+        return htmlFiles;
     }
 
     public boolean compileHTML(){
 
-        HTMLFile[] htmlFiles = new HTMLFile[0];
-
         File folder = new File("src/files/PARTs_Website");//TODO make not static
         File[] listOfFiles = folder.listFiles();
 
-        File[] files = getDynamicHTML(listOfFiles, htmlFiles, 0);
+        HTMLFile[] htmlFiles = getDynamicHTML(listOfFiles);
 
-        for(File h : files) {
+        for(HTMLFile h : htmlFiles) {
             if (h != null) {
-                System.out.println("Directory: " + h.getAbsolutePath());
+                System.out.println("Directory: " + h.getPath());
                 //System.out.println("HTML\n" + h.getHtml());
             }
         }
