@@ -111,6 +111,10 @@ public class HTMLReader {
                     lines[j++] = null; //catches the last line the while loop doesn't get
                     break;
                 }
+                else if (lines[j].contains("<footer")){ //in case the nav doesn't exist, but the footer does
+                    j--;
+                    break;
+                }
             }
 
             //removes footer if it exists
@@ -124,6 +128,8 @@ public class HTMLReader {
                 }
             }
 
+            for (String s : lines) System.out.println(s);
+
             //remove null spaces
             String[] temp = lines;
             lines = new String[0];
@@ -135,13 +141,16 @@ public class HTMLReader {
                 }
             }
 
+
+
             //add the nav and footer
             String compiled = "";
             for (int k = 0; k < lines.length; k++){
                 compiled += lines[k] + "\n";
                 if (lines[k].contains("<body id=\"top\">")) compiled += nav;
                 if (lines[k].contains("</main>")){
-                    compiled += lines[k++]  + "\n"; //this is because there is a closing div right after main's closing then the footer goes there
+                    compiled += lines[++k]  + "\n"; //this is because there is a closing div right after main's closing then the footer goes there
+                    //compiled += "FOOTER HERE\n";
                     compiled += footer;
                 }
             }
