@@ -10,8 +10,8 @@ public class Test {
 
     public static void main(String[] args) {
         String navHTML, footerHTML, pathHTML;
-        navHTML = "src/files/header.html";
-        footerHTML = "src/files/footer.html";
+        navHTML = "src/files/nav";
+        footerHTML = "src/files/footer";
         pathHTML = "src/files/PARTs_Website";
         HTMLReader htmlReader = new HTMLReader(navHTML, footerHTML, pathHTML);
         htmlReader.writeHTML();

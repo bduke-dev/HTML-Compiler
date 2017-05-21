@@ -103,9 +103,22 @@ public class HTMLReader {
         return htmlFiles;
     }
 
+    private HTMLFile[] getDynamicHTML(File navPath){
+        File[] listOfFiles = navPath.listFiles();
+        HTMLFile[] html = new HTMLFile[listOfFiles.length];
+
+        for (int i = 0; i < listOfFiles.length; i++){
+            int depth = Integer.parseInt(listOfFiles[i].getName().replace(".html", ""));
+            html[i] = new HTMLFile(readHTML(listOfFiles[i]), listOfFiles[i], depth);
+        }
+        return html;
+    }
+
     private HTMLFile[] compileHTML(){
         HTMLFile[] htmlFiles = getProject(pathHTML.listFiles()); //all chosen html files
-        String nav = readHTML(navHTML), footer = readHTML(footerHTML); //nav and footer html file
+        HTMLFile[] nav = getDynamicHTML(navHTML), footer = getDynamicHTML(footerHTML); //nav and footer html file
+
+        for (HTMLFile h : footer) System.out.println(h.getDepth() + "\n" + h.getFile());
 
         for (int i = 0; i < htmlFiles.length; i++){
             String[] lines = htmlFiles[i].getHtml().split("\n"); //turn into array to null indices that are in the nav or footer if it exists
