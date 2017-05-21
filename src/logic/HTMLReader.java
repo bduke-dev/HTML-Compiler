@@ -228,7 +228,6 @@ public class HTMLReader {
         return htmlFiles;
     }
 
-    //TODO change page name on that file >< in the nav as well as the .currentPage
     public boolean writeHTML(){
         boolean success = false;
 
@@ -239,7 +238,6 @@ public class HTMLReader {
                 fileWriter = new FileWriter(h.getFile().getAbsoluteFile());
                 fileWriter.write(h.getHtml());
                 fileWriter.close();
-                System.out.println(h.getCurrentPage());
             } catch (IOException e) {e.printStackTrace();}
         }
 
