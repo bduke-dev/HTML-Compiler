@@ -114,6 +114,8 @@ public class HTMLReader {
         return html;
     }
 
+    //required comments in documentation
+    //add error handling to help user diagnose issues, like check tags. also make them aware they can't be on the same line
     private HTMLFile[] compileHTML(){
         HTMLFile[] htmlFiles = getProject(pathHTML.listFiles()); //all chosen html files
         HTMLFile[] nav = getDynamicHTML(navHTML), footer = getDynamicHTML(footerHTML); //nav and footer html file
@@ -124,14 +126,15 @@ public class HTMLReader {
             int j = 0;
             //removes nav if it exists
             for (; j < lines.length; j++){
-                if (lines[j].contains("<nav")){
-                    while (!lines[j].contains("</nav>")){
+                if (lines[j].contains("<!--nav-->")){
+                    j++;
+                    while (!lines[j].contains("<!--/nav-->")){
                         lines[j++] = null;
                     }
-                    lines[j++] = null; //catches the last line the while loop doesn't get
+                    //lines[j++] = null; //catches the last line the while loop doesn't get
                     break;
                 }
-                else if (lines[j].contains("<footer")){ //in case the nav doesn't exist, but the footer does
+                else if (lines[j].contains("<!--footer-->")){ //in case the nav doesn't exist, but the footer does
                     j--;
                     break;
                 }
@@ -139,11 +142,12 @@ public class HTMLReader {
 
             //removes footer if it exists
             for (; j < lines.length; j++){
-                if (lines[j].contains("<footer")){
-                    while (!lines[j].contains("</footer>")){
+                if (lines[j].contains("<!--footer-->")){
+                    j++;
+                    while (!lines[j].contains("<!--/footer-->")){
                         lines[j++] = null;
                     }
-                    lines[j++] = null; //catches the last line the while loop doesn't get
+                    //lines[j++] = null; //catches the last line the while loop doesn't get
                     break;
                 }
             }
@@ -170,11 +174,8 @@ public class HTMLReader {
             }
             for (int k = 0; k < lines.length; k++){
                 compiled += lines[k] + "\n";
-                if (lines[k].contains("<body id=\"top\">")) compiled += navString;
-                if (lines[k].contains("</main>")){
-                    compiled += lines[++k]  + "\n"; //this is because there is a closing div right after main's closing then the footer goes there
-                    compiled += footerString;
-                }
+                if (lines[k].contains("<!--nav-->")) compiled += navString;
+                if (lines[k].contains("<!--footer-->")) compiled += footerString;
             }
             htmlFiles[i].appendHtml(compiled);
         }
@@ -182,7 +183,6 @@ public class HTMLReader {
     }
 
     //TODO change page name on that file >< in the nav as well as the .currentPage
-    //TODO require html comments for where to put the nav and footer
     public boolean writeHTML(){
         boolean success = false;
 
