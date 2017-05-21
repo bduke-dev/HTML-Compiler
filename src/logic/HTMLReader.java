@@ -214,10 +214,6 @@ public class HTMLReader {
                 navString += currentLine + "\n";
             }
 
-            System.out.println(currentPage);
-
-
-
             for (int k = 0; k < lines.length; k++){
                 compiled += lines[k] + "\n";
                 if (lines[k].contains("<!--nav-->")) compiled += navString;
