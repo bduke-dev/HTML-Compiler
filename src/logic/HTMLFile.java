@@ -9,10 +9,12 @@ import java.io.File;
 public class HTMLFile {
     private String html;
     private File file;
+    private int depth;
 
-    public HTMLFile(String html, File file){
+    public HTMLFile(String html, File file, int depth){
         this.html = html;
         this.file = file;
+        this.depth = depth;
     }
 
     public String getHtml() {
@@ -25,5 +27,9 @@ public class HTMLFile {
 
     public void appendHtml(String html) {
         this.html = html;
+    }
+
+    public int getDepth() {
+        return depth;
     }
 }

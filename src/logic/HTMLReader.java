@@ -89,7 +89,16 @@ public class HTMLReader {
 
         //get the file and path
         HTMLFile[] htmlFiles = new HTMLFile[listOfFiles.length];
-        for (int i = 0; i < htmlFiles.length; i++) htmlFiles[i] = new HTMLFile(readHTML(listOfFiles[i]), listOfFiles[i]);
+
+        //depth of each file so certain nav and footer can be used to preserve file paths to resources within project
+        int[] depth = new int[htmlFiles.length];
+        for (int i = 0; i < listOfFiles.length; i++){
+            String path = listOfFiles[i].getAbsolutePath().replace(pathHTML.getAbsolutePath(), "");
+            int count = path.length() - path.replace("/", "").length();
+            depth[i] = count;
+        }
+
+        for (int i = 0; i < htmlFiles.length; i++) htmlFiles[i] = new HTMLFile(readHTML(listOfFiles[i]), listOfFiles[i], depth[i]);
 
         return htmlFiles;
     }
@@ -127,8 +136,6 @@ public class HTMLReader {
                     break;
                 }
             }
-
-            for (String s : lines) System.out.println(s);
 
             //remove null spaces
             String[] temp = lines;
