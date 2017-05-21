@@ -8,14 +8,16 @@ import java.io.File;
  */
 public class HTMLFile {
     private String html, currentPage;
+    boolean homePage;
     private File file;
     private int depth;
 
-    public HTMLFile(String html, File file, int depth, String currentPage){
+    public HTMLFile(String html, File file, int depth, String currentPage, boolean homePage){
         this.html = html;
         this.file = file;
         this.depth = depth;
         this.currentPage = currentPage;
+        this.homePage = homePage;
     }
 
     public String getHtml() {
@@ -36,5 +38,9 @@ public class HTMLFile {
 
     public String getCurrentPage() {
         return currentPage;
+    }
+
+    public boolean isHomePage() {
+        return homePage;
     }
 }

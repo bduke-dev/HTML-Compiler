@@ -98,8 +98,14 @@ public class HTMLReader {
             depth[i] = count;
         }
 
-        for (int i = 0; i < htmlFiles.length; i++) htmlFiles[i] = new HTMLFile(readHTML(listOfFiles[i]), listOfFiles[i],
-                depth[i], listOfFiles[i].getParentFile().getAbsolutePath().replace(pathHTML.getAbsolutePath(), "").replace("/", ""));
+        boolean homePage;
+        for (int i = 0; i < htmlFiles.length; i++) {
+            if (listOfFiles[i].getAbsolutePath().equals(pathHTML.getAbsolutePath() + "/index.html")) homePage = true;
+            else homePage = false;
+            htmlFiles[i] = new HTMLFile(readHTML(listOfFiles[i]), listOfFiles[i],
+                    depth[i], listOfFiles[i].getParentFile().getAbsolutePath().replace(pathHTML.getAbsolutePath(), "").replace("/", ""),
+                    homePage);
+        }
 
 
 
@@ -113,7 +119,7 @@ public class HTMLReader {
 
         for (int i = 0; i < listOfFiles.length; i++){
             int depth = Integer.parseInt(listOfFiles[i].getName().replace(".html", ""));
-            html[i] = new HTMLFile(readHTML(listOfFiles[i]), listOfFiles[i], depth, "");
+            html[i] = new HTMLFile(readHTML(listOfFiles[i]), listOfFiles[i], depth, "", false);
         }
         return html;
     }
@@ -177,7 +183,7 @@ public class HTMLReader {
                 if (footer[k].getDepth() == depth) footerString = footer[k].getHtml();
             }
 
-            //optional .currentPage in nav/footer //TODO need special way to tell if not actual home page, like 404 page
+            //optional .currentPage in nav
             String currentPage = "";
             if (htmlFiles[i].getDepth() == 1) currentPage += "/" + htmlFiles[i].getCurrentPage();
             else {
@@ -189,8 +195,9 @@ public class HTMLReader {
             navString = "";
             while (scanner.hasNextLine()){
                 String currentLine = scanner.nextLine();
-                if (currentPage.equals("/")){ //this is home page or root
-                    if (currentLine.contains("<p><a href=\"/\"></a></p>") && currentLine.toLowerCase().contains("home")){
+                if (currentPage.equals("/")){ //catches all files in the root directory, like index, 404, etc.
+                    //hopefully a condition that can only be met on the home page
+                    if (currentLine.contains("<p><a href=\"/\"></a></p>") && currentLine.toLowerCase().contains("home") && htmlFiles[i].isHomePage()){
                         StringBuilder sb = new StringBuilder(currentLine);
                         int position = sb.indexOf("<a");
                         sb.insert(position + 2, " class=\"currentPage\"");
