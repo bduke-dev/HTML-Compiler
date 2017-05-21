@@ -98,23 +98,27 @@ public class HTMLReader {
             depth[i] = count;
         }
 
-        for (int i = 0; i < htmlFiles.length; i++) htmlFiles[i] = new HTMLFile(readHTML(listOfFiles[i]), listOfFiles[i], depth[i]);
+        for (int i = 0; i < htmlFiles.length; i++) htmlFiles[i] = new HTMLFile(readHTML(listOfFiles[i]), listOfFiles[i],
+                depth[i], listOfFiles[i].getParentFile().getAbsolutePath().replace(pathHTML.getAbsolutePath(), "").replace("/", ""));
+
+
 
         return htmlFiles;
     }
 
+    //for getting header or footer
     private HTMLFile[] getDynamicHTML(File navPath){
         File[] listOfFiles = navPath.listFiles();
         HTMLFile[] html = new HTMLFile[listOfFiles.length];
 
         for (int i = 0; i < listOfFiles.length; i++){
             int depth = Integer.parseInt(listOfFiles[i].getName().replace(".html", ""));
-            html[i] = new HTMLFile(readHTML(listOfFiles[i]), listOfFiles[i], depth);
+            html[i] = new HTMLFile(readHTML(listOfFiles[i]), listOfFiles[i], depth, "");
         }
         return html;
     }
 
-    //required comments in documentation
+    //required comments in documentation, to know where to place html
     //add error handling to help user diagnose issues, like check tags. also make them aware they can't be on the same line
     private HTMLFile[] compileHTML(){
         HTMLFile[] htmlFiles = getProject(pathHTML.listFiles()); //all chosen html files
@@ -172,6 +176,21 @@ public class HTMLReader {
                 if (nav[k].getDepth() == depth) navString = nav[k].getHtml();
                 if (footer[k].getDepth() == depth) footerString = footer[k].getHtml();
             }
+
+            //optional .currentPage in nav/footer
+            String currentPage = "";
+            if (htmlFiles[i].getDepth() == 1) currentPage = "/" + htmlFiles[i].getCurrentPage();
+            else {
+                for (int k = 1; k < htmlFiles[i].getDepth(); k++){
+                    currentPage += "../";
+                }
+                currentPage += htmlFiles[i].getCurrentPage();
+            }
+
+            System.out.println(currentPage);
+
+
+
             for (int k = 0; k < lines.length; k++){
                 compiled += lines[k] + "\n";
                 if (lines[k].contains("<!--nav-->")) compiled += navString;
@@ -193,6 +212,7 @@ public class HTMLReader {
                 fileWriter = new FileWriter(h.getFile().getAbsoluteFile());
                 fileWriter.write(h.getHtml());
                 fileWriter.close();
+                System.out.println(h.getCurrentPage());
             } catch (IOException e) {e.printStackTrace();}
         }
 

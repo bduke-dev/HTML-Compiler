@@ -7,14 +7,15 @@ import java.io.File;
  * @version 5/19/17
  */
 public class HTMLFile {
-    private String html;
+    private String html, currentPage;
     private File file;
     private int depth;
 
-    public HTMLFile(String html, File file, int depth){
+    public HTMLFile(String html, File file, int depth, String currentPage){
         this.html = html;
         this.file = file;
         this.depth = depth;
+        this.currentPage = currentPage;
     }
 
     public String getHtml() {
@@ -31,5 +32,9 @@ public class HTMLFile {
 
     public int getDepth() {
         return depth;
+    }
+
+    public String getCurrentPage() {
+        return currentPage;
     }
 }
