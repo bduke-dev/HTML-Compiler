@@ -42,7 +42,7 @@ public class HTMLReader {
         for (int i = 0; i < listOfFiles.length; i++){
             //null .git, .sass-cache, css, scss, sass //TODO make so user can specify
             if (listOfFiles[counter] != null) {
-                ArrayList<String> ignored = new ArrayList<>(Arrays.asList(".git", ".sass-cache", "css", "scss", "sass", "DEV FILES", "google071d8247f50df527.html"));
+                ArrayList<String> ignored = new ArrayList<>(Arrays.asList("partials", ".git", ".sass-cache", "css", "scss", "sass", "DEV FILES", "google071d8247f50df527.html"));
                 String path = listOfFiles[i].getName();
 
                 //null ignored files and directories in root project
@@ -113,7 +113,7 @@ public class HTMLReader {
     }
 
     //for getting header or footer
-    private HTMLFile[] getDynamicHTML(File navPath){
+    private HTMLFile[] getPartialHTML(File navPath){
         File[] listOfFiles = navPath.listFiles();
         HTMLFile[] html = new HTMLFile[listOfFiles.length];
 
@@ -128,7 +128,7 @@ public class HTMLReader {
     //add error handling to help user diagnose issues, like check tags. also make them aware they can't be on the same line
     private HTMLFile[] compileHTML(){
         HTMLFile[] htmlFiles = getProject(pathHTML.listFiles()); //all chosen html files
-        HTMLFile[] nav = getDynamicHTML(navHTML), footer = getDynamicHTML(footerHTML); //nav and footer html file
+        HTMLFile[] nav = getPartialHTML(navHTML), footer = getPartialHTML(footerHTML); //nav and footer html file
 
         for (int i = 0; i < htmlFiles.length; i++){
             String[] lines = htmlFiles[i].getHtml().split("\n"); //turn into array to null indices that are in the nav or footer if it exists
