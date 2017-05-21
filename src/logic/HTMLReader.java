@@ -177,14 +177,26 @@ public class HTMLReader {
                 if (footer[k].getDepth() == depth) footerString = footer[k].getHtml();
             }
 
-            //optional .currentPage in nav/footer
+            //optional .currentPage in nav/footer //TODO need special way to tell if not actual home page, like 404 page
             String currentPage = "";
-            if (htmlFiles[i].getDepth() == 1) currentPage = "/" + htmlFiles[i].getCurrentPage();
+            if (htmlFiles[i].getDepth() == 1) currentPage += "/" + htmlFiles[i].getCurrentPage();
             else {
-                for (int k = 1; k < htmlFiles[i].getDepth(); k++){
-                    currentPage += "../";
-                }
+                for (int k = 1; k < htmlFiles[i].getDepth(); k++) currentPage += "../";
                 currentPage += htmlFiles[i].getCurrentPage();
+            }
+
+            scanner = new Scanner(navString);
+            navString = "";
+            while (scanner.hasNextLine()){
+                String currentLine = scanner.nextLine();
+                if (currentLine.contains(currentPage) && !currentPage.equals("/")){
+                    StringBuilder sb = new StringBuilder(currentLine);
+                    int position = sb.indexOf("<a");
+                    sb.insert(position + 2, " class=\"currentPage\"");
+                    currentLine = sb.toString();
+                    System.out.println(position);
+                }
+                navString += currentLine + "\n";
             }
 
             System.out.println(currentPage);
