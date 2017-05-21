@@ -118,8 +118,6 @@ public class HTMLReader {
         HTMLFile[] htmlFiles = getProject(pathHTML.listFiles()); //all chosen html files
         HTMLFile[] nav = getDynamicHTML(navHTML), footer = getDynamicHTML(footerHTML); //nav and footer html file
 
-        for (HTMLFile h : footer) System.out.println(h.getDepth() + "\n" + h.getFile());
-
         for (int i = 0; i < htmlFiles.length; i++){
             String[] lines = htmlFiles[i].getHtml().split("\n"); //turn into array to null indices that are in the nav or footer if it exists
 
@@ -164,14 +162,18 @@ public class HTMLReader {
 
 
             //add the nav and footer
-            String compiled = "";
+            String compiled = "", navString = "", footerString = "";
+            int depth = htmlFiles[i].getDepth();
+            for (int k = 0; k < nav.length && k < footer.length; k++){ //make sure there are an equal number of files
+                if (nav[k].getDepth() == depth) navString = nav[k].getHtml();
+                if (footer[k].getDepth() == depth) footerString = footer[k].getHtml();
+            }
             for (int k = 0; k < lines.length; k++){
                 compiled += lines[k] + "\n";
-                if (lines[k].contains("<body id=\"top\">")) compiled += nav;
+                if (lines[k].contains("<body id=\"top\">")) compiled += navString;
                 if (lines[k].contains("</main>")){
                     compiled += lines[++k]  + "\n"; //this is because there is a closing div right after main's closing then the footer goes there
-                    //compiled += "FOOTER HERE\n";
-                    compiled += footer;
+                    compiled += footerString;
                 }
             }
             htmlFiles[i].appendHtml(compiled);
@@ -179,6 +181,8 @@ public class HTMLReader {
         return htmlFiles;
     }
 
+    //TODO change page name on that file >< in the nav as well as the .currentPage
+    //TODO require html comments for where to put the nav and footer
     public boolean writeHTML(){
         boolean success = false;
 
