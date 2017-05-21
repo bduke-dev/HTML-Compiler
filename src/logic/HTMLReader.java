@@ -189,12 +189,20 @@ public class HTMLReader {
             navString = "";
             while (scanner.hasNextLine()){
                 String currentLine = scanner.nextLine();
-                if (currentLine.contains(currentPage) && !currentPage.equals("/")){
+                if (currentPage.equals("/")){ //this is home page or root
+                    if (currentLine.contains("<p><a href=\"/\"></a></p>") && currentLine.toLowerCase().contains("home")){
+                        StringBuilder sb = new StringBuilder(currentLine);
+                        int position = sb.indexOf("<a");
+                        sb.insert(position + 2, " class=\"currentPage\"");
+                        currentLine = sb.toString();
+                    }
+
+                }
+                else if (currentLine.contains(currentPage)){
                     StringBuilder sb = new StringBuilder(currentLine);
                     int position = sb.indexOf("<a");
                     sb.insert(position + 2, " class=\"currentPage\"");
                     currentLine = sb.toString();
-                    System.out.println(position);
                 }
                 navString += currentLine + "\n";
             }
