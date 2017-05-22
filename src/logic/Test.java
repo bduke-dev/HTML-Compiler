@@ -13,7 +13,7 @@ public class Test {
         navHTML = "src/files/PARTs_Website/partials/nav";
         footerHTML = "src/files/PARTs_Website/partials/footer";
         pathHTML = "src/files/PARTs_Website";
-        HTMLReader htmlReader = new HTMLReader(navHTML, footerHTML, pathHTML);
-        htmlReader.writeHTML();
+        //HTMLReader htmlReader = new HTMLReader(navHTML, footerHTML, pathHTML);
+        //htmlReader.writeHTML();
     }
 }

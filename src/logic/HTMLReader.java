@@ -1,5 +1,8 @@
 package logic;
 
+import javafx.application.Platform;
+
+import javafx.scene.control.TextArea;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -12,14 +15,16 @@ import java.util.Scanner;
  * @author brandon
  * @version 5/18/17
  */
-public class HTMLReader {
+public class HTMLReader implements Runnable{
     private File navHTML, footerHTML, pathHTML;
+    private TextArea console;
     private Scanner scanner;
 
-    public HTMLReader(String navHTML, String footerHTML, String pathHTML){
-        this.navHTML = new File(navHTML);
-        this.footerHTML = new File(footerHTML);
-        this.pathHTML = new File(pathHTML);
+    public HTMLReader(File navHTML, File footerHTML, File pathHTML, TextArea console){
+        this.navHTML = navHTML;
+        this.footerHTML = footerHTML;
+        this.pathHTML = pathHTML;
+        this.console = console;
     }
 
     private String readHTML(File path){
@@ -234,6 +239,13 @@ public class HTMLReader {
                 fileWriter = new FileWriter(h.getFile().getAbsoluteFile());
                 fileWriter.write(h.getHtml());
                 fileWriter.close();
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        String temp = console.getText() + "\n";
+                        console.setText(temp + h.getFile());
+                    }
+                });
             } catch (IOException e) {e.printStackTrace();}
         }
 
@@ -243,4 +255,8 @@ public class HTMLReader {
         return success;
     }
 
+    @Override
+    public void run() {
+        writeHTML();
+    }
 }
