@@ -10,24 +10,19 @@
 <?import javafx.scene.control.Label?>
 
 <BorderPane prefHeight="524.0" prefWidth="615.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.Controller">
-   <bottom>
-      <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <Label prefHeight="98.0" prefWidth="157.0" text="Files and directories to ignore in root of project. Seperate with a comma." wrapText="true" />
-            <TextField prefHeight="100.0" prefWidth="515.0" promptText="Ignore" />
-         </children>
-      </HBox>
-   </bottom>
    <center>
       <TextArea fx:id="outputLog" editable="false" prefHeight="200.0" prefWidth="200.0" promptText="Output" BorderPane.alignment="CENTER" />
    </center>
    <left>
-      <VBox alignment="CENTER_LEFT" prefHeight="495.0" prefWidth="129.0" spacing="20.0" BorderPane.alignment="CENTER_LEFT">
+      <VBox alignment="CENTER_LEFT" prefHeight="495.0" prefWidth="133.0" spacing="20.0" BorderPane.alignment="CENTER_LEFT">
          <children>
             <Button fx:id="navDirectoryButton" mnemonicParsing="false" onAction="#getNavDirectory" text="Nav Directory" />
             <Button fx:id="footerDirectoryButton" mnemonicParsing="false" onAction="#getFooterDirectory" text="Footer Directory" />
             <Button fx:id="projectDirectoryButton" mnemonicParsing="false" onAction="#getPathDirectory" text="Project Directory" />
             <Button fx:id="compileButton" mnemonicParsing="false" onAction="#compile" text="Compile" />
+            <CheckBox fx:id="ignoreFileCheckBox" mnemonicParsing="false" text="Use Ignore File" />
+            <Button fx:id="loadIgnoreFileButton" mnemonicParsing="false" onAction="#getIgnoreDirectory" text="Load Ignore" />
+            <CheckBox fx:id="insertClassCheckBox" mnemonicParsing="false" text="Insert class=&quot;currentPage&quot;" wrapText="true" />
          </children>
          <BorderPane.margin>
             <Insets />

@@ -1,5 +1,6 @@
 package logic;
 
+import java.io.File;
 import java.util.Scanner;
 
 /**
@@ -9,11 +10,11 @@ import java.util.Scanner;
 public class Test {
 
     public static void main(String[] args) {
-        String navHTML, footerHTML, pathHTML;
-        navHTML = "src/files/PARTs_Website/partials/nav";
-        footerHTML = "src/files/PARTs_Website/partials/footer";
-        pathHTML = "src/files/PARTs_Website";
-        //HTMLReader htmlReader = new HTMLReader(navHTML, footerHTML, pathHTML);
-        //htmlReader.writeHTML();
+        File navHTML, footerHTML, pathHTML;
+        navHTML = new File("src/files/PARTs_Website/partials/nav");
+        footerHTML = new File("src/files/PARTs_Website/partials/footer");
+        pathHTML = new File("src/files/PARTs_Website");
+        HTMLReader htmlReader = new HTMLReader(navHTML, footerHTML, pathHTML);
+        htmlReader.writeHTML();
     }
 }

@@ -27,6 +27,13 @@ public class HTMLReader implements Runnable{
         this.console = console;
     }
 
+    public HTMLReader(File navHTML, File footerHTML, File pathHTML){
+        this.navHTML = navHTML;
+        this.footerHTML = footerHTML;
+        this.pathHTML = pathHTML;
+        this.console = null;
+    }
+
     private String readHTML(File path){
         String returnString = "";
 
@@ -46,12 +53,15 @@ public class HTMLReader implements Runnable{
 
         for (int i = 0; i < listOfFiles.length; i++){
             //null .git, .sass-cache, css, scss, sass //TODO make so user can specify
-            if (listOfFiles[counter] != null) {
+            if (listOfFiles[i] != null) {
                 ArrayList<String> ignored = new ArrayList<>(Arrays.asList("partials", ".git", ".sass-cache", "css", "scss", "sass", "DEV FILES", "google071d8247f50df527.html"));
                 String path = listOfFiles[i].getName();
 
                 //null ignored files and directories in root project
-                if (ignored.contains(path)) listOfFiles[i] = null;
+                if (ignored.contains(path)) {
+                    listOfFiles[i] = null;
+                    System.out.println("ignores: " + path); //TODO remove
+                }
             }
         }
 
@@ -239,13 +249,15 @@ public class HTMLReader implements Runnable{
                 fileWriter = new FileWriter(h.getFile().getAbsoluteFile());
                 fileWriter.write(h.getHtml());
                 fileWriter.close();
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        String temp = console.getText() + "\n";
-                        console.setText(temp + h.getFile());
-                    }
-                });
+                if (console != null) {
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            String temp = console.getText() + "\n";
+                            console.setText(temp + h.getFile());
+                        }
+                    });
+                }
             } catch (IOException e) {e.printStackTrace();}
         }
 
