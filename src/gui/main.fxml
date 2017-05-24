@@ -21,8 +21,10 @@
             <Button fx:id="projectDirectoryButton" mnemonicParsing="false" onAction="#getPathDirectory" text="Project Directory" />
             <Button fx:id="compileButton" mnemonicParsing="false" onAction="#compile" text="Compile" />
             <CheckBox fx:id="ignoreFileCheckBox" mnemonicParsing="false" text="Use Ignore File" />
-            <Button fx:id="loadIgnoreFileButton" mnemonicParsing="false" onAction="#getIgnoreDirectory" text="Load Ignore" />
+            <Button fx:id="loadIgnoreFileButton" mnemonicParsing="false" onAction="#getIgnoreFile" text="Load Ignore" />
             <CheckBox fx:id="insertClassCheckBox" mnemonicParsing="false" text="Insert class=&quot;currentPage&quot;" wrapText="true" />
+            <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveSettings" text="Save Settings" />
+            <Button fx:id="loadSettings" mnemonicParsing="false" onAction="#loadSettings" text="Load Settings" />
          </children>
          <BorderPane.margin>
             <Insets />
