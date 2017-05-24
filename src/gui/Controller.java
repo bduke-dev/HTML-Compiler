@@ -1,5 +1,6 @@
 package gui;
 
+import gui.windows.SimpleWindow;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -27,6 +28,8 @@ public class Controller {
     private @FXML CheckBox ignoreFileCheckBox, insertClassCheckBox;
     private File defaultDirectory;
 
+    private SimpleWindow simpleWindow;
+
 //TODO only allow advacement on no erro when selecting a file
     public void initialize() {
         outputLog.setText("Choose a directory to start!");
@@ -34,7 +37,7 @@ public class Controller {
         projectDirectoryButton.setDisable(true);
         compileButton.setDisable(true);
         loadIgnoreFileButton.setDisable(true);
-        //saveButton.setDisable(true);
+        saveButton.setDisable(true);
 
 
         //event handler for checkboxes
@@ -61,44 +64,68 @@ public class Controller {
 
 
     public void getNavDirectory(){//TODO only allow advancement if chosen file
-        DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setTitle("Choose Nav Directory");
-        navHTML = chooser.showDialog(new Stage());
-        defaultDirectory = navHTML;
-        setOutput(navHTML);
-        footerDirectoryButton.setDisable(false);
+        try {
+            DirectoryChooser chooser = new DirectoryChooser();
+            chooser.setTitle("Choose Nav Directory");
+            navHTML = chooser.showDialog(new Stage());
+            defaultDirectory = navHTML;
+            setOutput(navHTML, "Nav Directory");
+            footerDirectoryButton.setDisable(false);
+        }
+        catch (Exception e){
+            if (e.getMessage() != null) {
+                simpleWindow = new SimpleWindow("File Error\n" + e.getMessage(), "File Error", 16);
+                simpleWindow.display();
+            }
+        }
     }
 
     public void getFooterDirectory(){
-        DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setTitle("Choose Footer Directory");
-        chooser.setInitialDirectory(defaultDirectory);
-        footerHTML = chooser.showDialog(new Stage());
-        setOutput(footerHTML);
-        projectDirectoryButton.setDisable(false);
+        try {
+            DirectoryChooser chooser = new DirectoryChooser();
+            chooser.setTitle("Choose Footer Directory");
+            chooser.setInitialDirectory(defaultDirectory);
+            footerHTML = chooser.showDialog(new Stage());
+            setOutput(footerHTML, "Footer Directory");
+            projectDirectoryButton.setDisable(false);
+        }
+        catch (Exception e){
+            if (e.getMessage() != null) {
+                simpleWindow = new SimpleWindow("File Error\n" + e.getMessage(), "File Error", 16);
+                simpleWindow.display();
+            }
+        }
     }
 
     public void getPathDirectory(){
-        DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setTitle("Choose Path Directory");
-        chooser.setInitialDirectory(defaultDirectory);
-        pathHTML = chooser.showDialog(new Stage());
-        setOutput(pathHTML);
-        compileButton.setDisable(false);
-        saveButton.setDisable(false);
+        try {
+            DirectoryChooser chooser = new DirectoryChooser();
+            chooser.setTitle("Choose Path Directory");
+            chooser.setInitialDirectory(defaultDirectory);
+            pathHTML = chooser.showDialog(new Stage());
+            setOutput(pathHTML, "Project Directory");
+            compileButton.setDisable(false);
+            saveButton.setDisable(false);
+        }
+        catch (Exception e){
+            if (e.getMessage() != null) {
+                simpleWindow = new SimpleWindow("File Error\n" + e.getMessage(), "File Error", 16);
+                simpleWindow.display();
+            }
+        }
     }
 
-    public void getIgnoreFile(){ //TODO attach
+    public void getIgnoreFile(){ //TODO attach to cdoe
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Choose Ignore File");
         chooser.setInitialDirectory(defaultDirectory);
         ignoreFile = chooser.showOpenDialog(new Stage());
         defaultDirectory = ignoreFile;
-        setOutput(ignoreFile);
+        setOutput(ignoreFile, "Ignore File");
     }
 
-    private void setOutput(File f){
-        String temp = outputLog.getText() + "\n";
+    private void setOutput(File f, String s){
+        String temp = outputLog.getText() + "\n" + s + " Path:\n";
         outputLog.setText(temp + f.getAbsolutePath());
     }
 
@@ -144,7 +171,7 @@ public class Controller {
         chooser.setInitialDirectory(defaultDirectory);
         loadFile = chooser.showOpenDialog(new Stage());
         defaultDirectory = loadFile;
-        setOutput(loadFile);
+        setOutput(loadFile, "Load File");
         try {
             Scanner scanner = new Scanner(loadFile);
             String settings = "";
@@ -157,11 +184,10 @@ public class Controller {
             useIgnoreFile = Boolean.parseBoolean(settingsSplit[4]);
             useInsertClass = Boolean.parseBoolean(settingsSplit[5]);
 
-            setOutput(navHTML);
-            setOutput(footerHTML);
-            setOutput(pathHTML);
-            setOutput(ignoreFile);
-            System.out.println("LOAD BOOLEAN STATUS: IGNORE: " + useIgnoreFile + " INSERT CLASS: " + useInsertClass);
+            setOutput(navHTML, "Nav Directory");
+            setOutput(footerHTML, "Footer Directory");
+            setOutput(pathHTML, "Project Directory");
+            setOutput(ignoreFile, "Ignore File");
 
             footerDirectoryButton.setDisable(false);
             projectDirectoryButton.setDisable(false);
