@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Controller {
-    private File navHTML, footerHTML, pathHTML, ignoreFile;
+    private File navHTML, footerHTML, pathHTML, ignoreFile, loadFile;
     private boolean useIgnoreFile = false, useInsertClass = false;
 
     private @FXML TextArea outputLog;
@@ -27,7 +27,7 @@ public class Controller {
     private @FXML CheckBox ignoreFileCheckBox, insertClassCheckBox;
     private File defaultDirectory;
 
-
+//TODO only allow advacement on no erro when selecting a file
     public void initialize() {
         outputLog.setText("Choose a directory to start!");
         footerDirectoryButton.setDisable(true);
@@ -44,11 +44,14 @@ public class Controller {
                 if (event.getSource() instanceof CheckBox) {
                     CheckBox chk = (CheckBox) event.getSource();
                     System.out.println("Action performed on checkbox " + chk.getText());
-                    if (ignoreFileCheckBox.isSelected() || !ignoreFileCheckBox.isSelected()){ //TODO may not actually need this
+                    if (chk.getText().equals("Use Ignore File")){ //TODO attach chotce to code
                         useIgnoreFile = ignoreFileCheckBox.isSelected();
                         loadIgnoreFileButton.setDisable(!useIgnoreFile);
                     }
-                    else if (insertClassCheckBox.isSelected() || !insertClassCheckBox.isSelected()) useInsertClass = insertClassCheckBox.isSelected();
+                    else if (chk.getText().equals("Insert class=\"currentPage\"")) {
+                        useInsertClass = insertClassCheckBox.isSelected();
+                        System.out.println("val change: " + useInsertClass);
+                    }
                 }
             }
         };
@@ -85,7 +88,7 @@ public class Controller {
         saveButton.setDisable(false);
     }
 
-    public void getIgnoreFile(){
+    public void getIgnoreFile(){ //TODO attach
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Choose Ignore File");
         chooser.setInitialDirectory(defaultDirectory);
@@ -100,30 +103,37 @@ public class Controller {
     }
 
     public void saveSettings(){
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("Save File");
-        //chooser.setInitialDirectory(defaultDirectory); //TODO seemse to be an error when all things are chones then going to save
-        File saveLoc = chooser.showSaveDialog(new Stage());
-        String fileName, path;
-        if (saveLoc.getName().contains(".")){
-            int index = saveLoc.getName().indexOf(".");
-            fileName = saveLoc.getName().substring(0, index);
-            path = saveLoc.getParentFile().getAbsolutePath();
-            saveLoc = new File(path + "/" + fileName + ".dat");
+        File saveLoc;
+        if (loadFile.exists()){
+            saveLoc = loadFile;
         }
         else {
-            fileName = saveLoc.getName();
-            path = saveLoc.getParentFile().getAbsolutePath();
-            saveLoc = new File(path + "/" + fileName + ".dat");
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Save File");
+            //chooser.setInitialDirectory(defaultDirectory); //TODO seems to be an error when all things are chones then going to save
+            saveLoc = chooser.showSaveDialog(new Stage());
+            String fileName, path;
+            if (saveLoc.getName().contains(".")) {
+                int index = saveLoc.getName().indexOf(".");
+                fileName = saveLoc.getName().substring(0, index);
+                path = saveLoc.getParentFile().getAbsolutePath();
+                saveLoc = new File(path + "/" + fileName + ".dat");
+            } else {
+                fileName = saveLoc.getName();
+                path = saveLoc.getParentFile().getAbsolutePath();
+                saveLoc = new File(path + "/" + fileName + ".dat");
+            }
         }
 
         String data = navHTML.getAbsolutePath() + "\n" + footerHTML.getAbsolutePath()
                 + "\n" + pathHTML.getAbsolutePath() + "\n" + ignoreFile.getAbsolutePath()
                 + "\n" + useIgnoreFile + "\n" + useInsertClass;
+
         try {
             FileWriter fw = new FileWriter(saveLoc);
             fw.write(data);
             fw.close();
+            System.out.println(data);
         }
         catch (IOException ioe){ioe.printStackTrace();}
     }
@@ -132,11 +142,11 @@ public class Controller {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Choose Settings File");
         chooser.setInitialDirectory(defaultDirectory);
-        File load = chooser.showOpenDialog(new Stage());
-        defaultDirectory = load;
-        setOutput(load);
+        loadFile = chooser.showOpenDialog(new Stage());
+        defaultDirectory = loadFile;
+        setOutput(loadFile);
         try {
-            Scanner scanner = new Scanner(load);
+            Scanner scanner = new Scanner(loadFile);
             String settings = "";
             while (scanner.hasNextLine()) settings += scanner.nextLine() + "\n";
             String[] settingsSplit = settings.split("\n");
@@ -158,6 +168,8 @@ public class Controller {
             compileButton.setDisable(false);
             loadIgnoreFileButton.setDisable(false);
             saveButton.setDisable(false);
+            ignoreFileCheckBox.setSelected(useIgnoreFile);
+            insertClassCheckBox.setSelected(useInsertClass);
         }
         catch (FileNotFoundException fnfe){fnfe.printStackTrace();}
     }
