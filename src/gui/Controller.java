@@ -11,26 +11,30 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import logic.HTMLReader;
+import logic.SimpleException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Controller {
-    private File navHTML, footerHTML, pathHTML, ignoreFile, loadFile;
+    private File navHTML, footerHTML, pathHTML, ignoreFile, loadFile, defaultDirectory;
+    private DirectoryChooser directoryChooser = new DirectoryChooser();
+    private FileChooser fileChooser = new FileChooser();
+
     private boolean useIgnoreFile = false, useInsertClass = false;
+    private SimpleWindow simpleWindow;
+    private ArrayList<String> ignore = new ArrayList<>();
+    private Scanner scanner;
 
     private @FXML TextArea outputLog;
     private @FXML Button navDirectoryButton, footerDirectoryButton, projectDirectoryButton,
             compileButton, loadIgnoreFileButton, saveButton;
     private @FXML CheckBox ignoreFileCheckBox, insertClassCheckBox;
-    private File defaultDirectory;
 
-    private SimpleWindow simpleWindow;
-
-//TODO only allow advacement on no erro when selecting a file
     public void initialize() {
         outputLog.setText("Choose a directory to start!");
         footerDirectoryButton.setDisable(true);
@@ -47,7 +51,7 @@ public class Controller {
                 if (event.getSource() instanceof CheckBox) {
                     CheckBox chk = (CheckBox) event.getSource();
                     System.out.println("Action performed on checkbox " + chk.getText());
-                    if (chk.getText().equals("Use Ignore File")){ //TODO attach chotce to code
+                    if (chk.getText().equals("Use Ignore File")){
                         useIgnoreFile = ignoreFileCheckBox.isSelected();
                         loadIgnoreFileButton.setDisable(!useIgnoreFile);
                     }
@@ -62,12 +66,10 @@ public class Controller {
         insertClassCheckBox.setOnAction(eventHandler);
     }
 
-
-    public void getNavDirectory(){//TODO only allow advancement if chosen file
+    public void getNavDirectory(){
         try {
-            DirectoryChooser chooser = new DirectoryChooser();
-            chooser.setTitle("Choose Nav Directory");
-            navHTML = chooser.showDialog(new Stage());
+            directoryChooser.setTitle("Choose Nav Directory");
+            navHTML = directoryChooser.showDialog(new Stage());
             defaultDirectory = navHTML;
             setOutput(navHTML, "Nav Directory");
             footerDirectoryButton.setDisable(false);
@@ -82,10 +84,9 @@ public class Controller {
 
     public void getFooterDirectory(){
         try {
-            DirectoryChooser chooser = new DirectoryChooser();
-            chooser.setTitle("Choose Footer Directory");
-            chooser.setInitialDirectory(defaultDirectory);
-            footerHTML = chooser.showDialog(new Stage());
+            directoryChooser.setTitle("Choose Footer Directory");
+            directoryChooser.setInitialDirectory(defaultDirectory);
+            footerHTML = directoryChooser.showDialog(new Stage());
             setOutput(footerHTML, "Footer Directory");
             projectDirectoryButton.setDisable(false);
         }
@@ -99,10 +100,9 @@ public class Controller {
 
     public void getPathDirectory(){
         try {
-            DirectoryChooser chooser = new DirectoryChooser();
-            chooser.setTitle("Choose Path Directory");
-            chooser.setInitialDirectory(defaultDirectory);
-            pathHTML = chooser.showDialog(new Stage());
+            directoryChooser.setTitle("Choose Path Directory");
+            directoryChooser.setInitialDirectory(defaultDirectory);
+            pathHTML = directoryChooser.showDialog(new Stage());
             setOutput(pathHTML, "Project Directory");
             compileButton.setDisable(false);
             saveButton.setDisable(false);
@@ -116,17 +116,31 @@ public class Controller {
     }
 
     public void getIgnoreFile(){ //TODO attach to cdoe
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("Choose Ignore File");
-        chooser.setInitialDirectory(defaultDirectory);
-        ignoreFile = chooser.showOpenDialog(new Stage());
-        defaultDirectory = ignoreFile;
-        setOutput(ignoreFile, "Ignore File");
-    }
+        try {
+            fileChooser.setTitle("Choose Ignore File");
+            fileChooser.setInitialDirectory(defaultDirectory);
+            ignoreFile = fileChooser.showOpenDialog(new Stage());
+            defaultDirectory = ignoreFile;
+            setOutput(ignoreFile, "Ignore File");
 
-    private void setOutput(File f, String s){
-        String temp = outputLog.getText() + "\n" + s + " Path:\n";
-        outputLog.setText(temp + f.getAbsolutePath());
+            scanner = new Scanner(ignoreFile);
+            while (scanner.hasNextLine()) {
+                String[] items = scanner.nextLine().split(",");
+                for (String s : items) {
+                    System.out.println(s);
+                    s = s.trim();
+                    ignore.add(s);
+                }
+            }
+
+            if (ignore.isEmpty()) throw new SimpleException("EMPTY IGNORE FILE");
+        }
+        catch (Exception e){
+            if (e.getMessage() != null) {
+                simpleWindow = new SimpleWindow("File Error\n" + e.getMessage(), "File Error", 16);
+                simpleWindow.display();
+            }
+        }
     }
 
     public void saveSettings(){
@@ -135,10 +149,10 @@ public class Controller {
             saveLoc = loadFile;
         }
         else {
-            FileChooser chooser = new FileChooser();
-            chooser.setTitle("Save File");
-            //chooser.setInitialDirectory(defaultDirectory); //TODO seems to be an error when all things are chones then going to save
-            saveLoc = chooser.showSaveDialog(new Stage());
+            fileChooser.setTitle("Save File");
+            //directoryChooser.setInitialDirectory(defaultDirectory); //TODO seems to be an error when all things are chones then going to save
+            saveLoc = fileChooser.showSaveDialog(new Stage());
+
             String fileName, path;
             if (saveLoc.getName().contains(".")) {
                 int index = saveLoc.getName().indexOf(".");
@@ -152,9 +166,14 @@ public class Controller {
             }
         }
 
+        String ignoreString = "";
+        if (useIgnoreFile && !ignore.isEmpty()) {
+            for (String s : ignore) ignoreString += s + ", ";
+        }
+
         String data = navHTML.getAbsolutePath() + "\n" + footerHTML.getAbsolutePath()
-                + "\n" + pathHTML.getAbsolutePath() + "\n" + ignoreFile.getAbsolutePath()
-                + "\n" + useIgnoreFile + "\n" + useInsertClass;
+                + "\n" + pathHTML.getAbsolutePath() + "\n" + ignoreFile.getAbsolutePath() //TODO change to ignore file arraylist
+                + "\n" + useIgnoreFile + "\n" + ignoreString + "\n" + useInsertClass;
 
         try {
             FileWriter fw = new FileWriter(saveLoc);
@@ -166,14 +185,15 @@ public class Controller {
     }
 
     public void loadSettings(){
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("Choose Settings File");
-        chooser.setInitialDirectory(defaultDirectory);
-        loadFile = chooser.showOpenDialog(new Stage());
+        fileChooser.setTitle("Choose Settings File");
+        //directoryChooser.setInitialDirectory(defaultDirectory); //TODO gave an error
+        loadFile = fileChooser.showOpenDialog(new Stage());
         defaultDirectory = loadFile;
+
         setOutput(loadFile, "Load File");
-        try {
-            Scanner scanner = new Scanner(loadFile);
+
+        try {//TODO get ignore string from file and put it in the array list
+            scanner = new Scanner(loadFile);
             String settings = "";
             while (scanner.hasNextLine()) settings += scanner.nextLine() + "\n";
             String[] settingsSplit = settings.split("\n");
@@ -201,8 +221,12 @@ public class Controller {
     }
 
     public void compile(){
-        HTMLReader htmlReader = new HTMLReader(navHTML, footerHTML, pathHTML, outputLog);
+        HTMLReader htmlReader = new HTMLReader(navHTML, footerHTML, pathHTML, outputLog, ignore);
         htmlReader.run();
     }
 
+    private void setOutput(File f, String s){
+        String temp = outputLog.getText() + "\n" + s + " Path:\n";
+        outputLog.setText(temp + f.getAbsolutePath());
+    }
 }
