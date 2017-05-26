@@ -18,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Controller {
@@ -167,13 +168,28 @@ public class Controller {
         }
 
         String ignoreString = "";
-        if (useIgnoreFile && !ignore.isEmpty()) {
+        if (useIgnoreFile && ignore.size() > 0) {
+            System.out.println("RUN 1");
             for (String s : ignore) ignoreString += s + ", ";
+        }
+        else if (useIgnoreFile && ignore.size() == 0){
+            try {
+                System.out.println("RUN");
+                scanner = new Scanner(ignoreFile);
+                while (scanner.hasNextLine()) {
+                    ignoreString += scanner.nextLine();
+                    if (scanner.hasNextLine()) ignoreString += ",";
+                }
+            }
+            catch (FileNotFoundException fnfe){fnfe.printStackTrace();}
         }
 
         String data = navHTML.getAbsolutePath() + "\n" + footerHTML.getAbsolutePath()
                 + "\n" + pathHTML.getAbsolutePath() + "\n" + ignoreFile.getAbsolutePath() //TODO change to ignore file arraylist
-                + "\n" + useIgnoreFile + "\n" + ignoreString + "\n" + useInsertClass;
+                + "\n" + useIgnoreFile + "\n" + useInsertClass;
+
+        if (useIgnoreFile) data += "\n" + ignoreString;
+        else data += "\n";
 
         try {
             FileWriter fw = new FileWriter(saveLoc);
@@ -203,6 +219,16 @@ public class Controller {
             ignoreFile = new File(settingsSplit[3]);
             useIgnoreFile = Boolean.parseBoolean(settingsSplit[4]);
             useInsertClass = Boolean.parseBoolean(settingsSplit[5]);
+
+            try {
+                String[] s = settingsSplit[6].split(",");
+                if (useIgnoreFile && s.length > 0) {
+                    System.out.println("READ IN IGNORE");
+                    ignore.clear();
+                    ignore.addAll(Arrays.asList(s));
+                }
+            }
+            catch (ArrayIndexOutOfBoundsException aiobe){}
 
             setOutput(navHTML, "Nav Directory");
             setOutput(footerHTML, "Footer Directory");
