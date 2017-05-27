@@ -18,9 +18,11 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 
+/**
+ * Controller class for JavaFX
+ */
 public class Controller {
     private File navHTML, footerHTML, pathHTML, ignoreFile, loadFile, defaultDirectory;
     private DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -36,8 +38,13 @@ public class Controller {
             compileButton, loadIgnoreFileButton, saveButton;
     private @FXML CheckBox ignoreFileCheckBox, insertClassCheckBox;
 
+    /**
+     * A method to initialize the GUI
+     */
     public void initialize() {
         outputLog.setText("Choose a directory to start!");
+
+        //disable certain buttons to force user to make choices in order
         footerDirectoryButton.setDisable(true);
         projectDirectoryButton.setDisable(true);
         compileButton.setDisable(true);
@@ -46,20 +53,17 @@ public class Controller {
 
 
         //event handler for checkboxes
-        EventHandler eventHandler = new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                if (event.getSource() instanceof CheckBox) {
-                    CheckBox chk = (CheckBox) event.getSource();
-                    System.out.println("Action performed on checkbox " + chk.getText());
-                    if (chk.getText().equals("Use Ignore File")){
-                        useIgnoreFile = ignoreFileCheckBox.isSelected();
-                        loadIgnoreFileButton.setDisable(!useIgnoreFile);
-                    }
-                    else if (chk.getText().equals("Insert class=\"currentPage\"")) {
-                        useInsertClass = insertClassCheckBox.isSelected();
-                        System.out.println("val change: " + useInsertClass);
-                    }
+        EventHandler eventHandler = (EventHandler<ActionEvent>) event -> {
+            if (event.getSource() instanceof CheckBox) {
+                CheckBox chk = (CheckBox) event.getSource();
+                System.out.println("Action performed on checkbox " + chk.getText());
+                if (chk.getText().equals("Use Ignore File")){
+                    useIgnoreFile = ignoreFileCheckBox.isSelected();
+                    loadIgnoreFileButton.setDisable(!useIgnoreFile);
+                }
+                else if (chk.getText().equals("Insert class=\"currentPage\"")) {
+                    useInsertClass = insertClassCheckBox.isSelected();
+                    System.out.println("val change: " + useInsertClass);
                 }
             }
         };
@@ -67,6 +71,10 @@ public class Controller {
         insertClassCheckBox.setOnAction(eventHandler);
     }
 
+    /**
+     * A method to get the navigation directory when the user selects the button
+     * The user can only advance to he next step when they choose a directory
+     */
     public void getNavDirectory(){
         try {
             directoryChooser.setTitle("Choose Nav Directory");
@@ -83,6 +91,10 @@ public class Controller {
         }
     }
 
+    /**
+     * A method to get the footer directory when the user selects the button
+     * The user can only advance to he next step when they choose a directory
+     */
     public void getFooterDirectory(){
         try {
             directoryChooser.setTitle("Choose Footer Directory");
@@ -99,6 +111,10 @@ public class Controller {
         }
     }
 
+    /**
+     * A method to get the project path directory when the user selects the button
+     * The user can only advance to he next step when they choose a directory
+     */
     public void getPathDirectory(){
         try {
             directoryChooser.setTitle("Choose Path Directory");
@@ -116,6 +132,10 @@ public class Controller {
         }
     }
 
+    /**
+     * A method to get the ignore file when the user selects the button
+     * The user can only advance to he next step when they choose a directory
+     */
     public void getIgnoreFile(){
         try {
             fileChooser.setTitle("Choose Ignore File");
@@ -144,47 +164,57 @@ public class Controller {
         }
     }
 
+    /**
+     * A method to write the current settings to a file
+     * This is so they can load settings for a given project
+     * and not have to do all of the selections again
+     * The user can also append settings to a loaded file
+     */
     public void saveSettings(){
         File saveLoc;
         if (loadFile != null){
+            //if a load file is chosen, don't ask the user where to save
+            //just save back to that file
             saveLoc = loadFile;
         }
         else {
             fileChooser.setTitle("Save File");
-            //directoryChooser.setInitialDirectory(defaultDirectory); //TODO seems to be an error when all things are chones then going to save
             saveLoc = fileChooser.showSaveDialog(new Stage());
             setOutput(saveLoc, "Save Location File");
 
+            //either change the file extension the user typed to .dat
+            //or just add it on to the file name
             String fileName, path;
             if (saveLoc.getName().contains(".")) {
                 int index = saveLoc.getName().indexOf(".");
                 fileName = saveLoc.getName().substring(0, index);
                 path = saveLoc.getParentFile().getAbsolutePath();
                 saveLoc = new File(path + "/" + fileName + ".dat");
-            } else {
+            }
+            else {
                 fileName = saveLoc.getName();
                 path = saveLoc.getParentFile().getAbsolutePath();
                 saveLoc = new File(path + "/" + fileName + ".dat");
             }
         }
 
-        String ignoreString = "";
+        //either turn the ignore ArrayList into a string or read it from the ignore file to a string
+        StringBuilder ignoreString = new StringBuilder();
         if (useIgnoreFile && ignore.size() > 0) {
-            System.out.println("RUN 1");
-            for (String s : ignore) ignoreString += s + ", ";
+            for (String s : ignore) ignoreString.append(s).append(", ");
         }
         else if (useIgnoreFile && ignore.size() == 0){
             try {
-                System.out.println("RUN");
                 scanner = new Scanner(ignoreFile);
                 while (scanner.hasNextLine()) {
-                    ignoreString += scanner.nextLine();
-                    if (scanner.hasNextLine()) ignoreString += ",";
+                    ignoreString.append(scanner.nextLine());
+                    if (scanner.hasNextLine()) ignoreString.append(",");
                 }
             }
             catch (FileNotFoundException fnfe){fnfe.printStackTrace();}
         }
 
+        //concatenate all of the settings to a multi-line string
         String data = navHTML.getAbsolutePath() + "\n" + footerHTML.getAbsolutePath()
                 + "\n" + pathHTML.getAbsolutePath() + "\n" + ignoreFile.getAbsolutePath()
                 + "\n" + useIgnoreFile + "\n" + useInsertClass;
@@ -201,19 +231,24 @@ public class Controller {
         catch (IOException ioe){ioe.printStackTrace();}
     }
 
+    /**
+     * A method to load saved settings
+     */
     public void loadSettings(){
         fileChooser.setTitle("Choose Settings File");
-        //directoryChooser.setInitialDirectory(defaultDirectory); //TODO gave an error
         loadFile = fileChooser.showOpenDialog(new Stage());
         defaultDirectory = loadFile;
 
         setOutput(loadFile, "Load File");
 
         try {
+            //read in the settings and split into an array containing the settings
             scanner = new Scanner(loadFile);
-            String settings = "";
-            while (scanner.hasNextLine()) settings += scanner.nextLine() + "\n";
-            String[] settingsSplit = settings.split("\n");
+            StringBuilder settings = new StringBuilder();
+            while (scanner.hasNextLine()) settings.append(scanner.nextLine()).append("\n");
+            String[] settingsSplit = settings.toString().split("\n");
+
+            //index he array and give it to the corresponding setting
             navHTML = new File(settingsSplit[0]);
             footerHTML = new File(settingsSplit[1]);
             pathHTML = new File(settingsSplit[2]);
@@ -221,6 +256,7 @@ public class Controller {
             useIgnoreFile = Boolean.parseBoolean(settingsSplit[4]);
             useInsertClass = Boolean.parseBoolean(settingsSplit[5]);
 
+            //if there is an ignore file, put it in the array list
             try {
                 String[] s = settingsSplit[6].split(",");
                 if (useIgnoreFile && s.length > 0) {
@@ -228,8 +264,9 @@ public class Controller {
                     for (String s1 : s) ignore.add(s1.trim());
                 }
             }
-            catch (ArrayIndexOutOfBoundsException aiobe){}
+            catch (ArrayIndexOutOfBoundsException aiobe){aiobe.printStackTrace();}
 
+            //set output and allow use of buttons so user can change settings
             setOutput(navHTML, "Nav Directory");
             setOutput(footerHTML, "Footer Directory");
             setOutput(pathHTML, "Project Directory");
@@ -246,11 +283,19 @@ public class Controller {
         catch (FileNotFoundException fnfe){fnfe.printStackTrace();}
     }
 
+    /**
+     * A method to start compilation process
+     */
     public void compile(){
         HTMLReader htmlReader = new HTMLReader(navHTML, footerHTML, pathHTML, outputLog, ignore, useInsertClass);
         htmlReader.run();
     }
 
+    /**
+     * A method to easily put output to the console in the application
+     * @param f file that was chosen
+     * @param s Message that goes with the selection
+     */
     private void setOutput(File f, String s){
         String temp = outputLog.getText() + "\n" + s + " Path:\n";
         outputLog.setText(temp + f.getAbsolutePath());
