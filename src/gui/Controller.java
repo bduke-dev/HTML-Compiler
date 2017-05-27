@@ -146,13 +146,14 @@ public class Controller {
 
     public void saveSettings(){
         File saveLoc;
-        if (loadFile.exists()){
+        if (loadFile != null){
             saveLoc = loadFile;
         }
         else {
             fileChooser.setTitle("Save File");
             //directoryChooser.setInitialDirectory(defaultDirectory); //TODO seems to be an error when all things are chones then going to save
             saveLoc = fileChooser.showSaveDialog(new Stage());
+            setOutput(saveLoc, "Save Location File");
 
             String fileName, path;
             if (saveLoc.getName().contains(".")) {
