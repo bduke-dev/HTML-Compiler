@@ -19,16 +19,16 @@ import javafx.stage.Stage;
  * @version 3/24/17
  */
 
-public class About {
+public class AboutWindow {
     private String windowName ,
             developer,
             version,
             appName,
             website,
             aboutApp;
-    public About(String windowName, String appName,
-                 String version, String aboutApp,
-                 String developer, String website){
+    public AboutWindow(String windowName, String appName,
+                       String version, String aboutApp,
+                       String developer, String website){
         this.windowName = windowName;
         this.appName = appName;
         this.version = version;

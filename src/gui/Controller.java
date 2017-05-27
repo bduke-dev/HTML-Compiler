@@ -1,5 +1,6 @@
 package gui;
 
+import gui.windows.AboutWindow;
 import gui.windows.SimpleWindow;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -292,6 +293,17 @@ public class Controller {
     public void compile(){
         HTMLReader htmlReader = new HTMLReader(navHTML, footerHTML, pathHTML, outputLog, ignore, useInsertClass);
         htmlReader.run();
+    }
+
+    /**
+     * A method to show the about window when called
+     */
+    public void openAboutWindow(){
+        AboutWindow aboutWindow = new AboutWindow("About", "HTML Compiler", "beta 1.0",
+                "This program allows a user to take a directory\n " +
+                        "full of html documents and update their navs and footers all at once.",
+                "Brandon Duke", "bduke.net");
+        aboutWindow.display();
     }
 
     /**
