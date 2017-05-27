@@ -13,7 +13,7 @@ import java.util.Scanner;
 //TODO required comments in documentation, to know where to place html
 //TODO add error handling to help user diagnose issues, like check tags. also make them aware they can't be on the same line
 /**
- * @author brandon
+ * @author Brandon Duke
  * @version 5/18/17
  */
 public class HTMLReader implements Runnable{

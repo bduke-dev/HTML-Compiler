@@ -22,6 +22,9 @@ import java.util.Scanner;
 
 /**
  * Controller class for JavaFX
+ *
+ * @author Brandon Duke
+ * @version 5/20/17
  */
 public class Controller {
     private File navHTML, footerHTML, pathHTML, ignoreFile, loadFile, defaultDirectory;
