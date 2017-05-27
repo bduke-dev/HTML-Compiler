@@ -29,27 +29,17 @@ public class HTMLReader implements Runnable{
         this.ignore = ignore;
     }
 
-    //TODO for dev only
-    public HTMLReader(File navHTML, File footerHTML, File pathHTML){
-        this.navHTML = navHTML;
-        this.footerHTML = footerHTML;
-        this.pathHTML = pathHTML;
-        this.console = null;
-        this.ignore = new ArrayList<>(Arrays.asList("partials", ".git", ".sass-cache", "css", "scss", "sass", "DEV FILES", "google071d8247f50df527.html"));
-
-    }
-
     private String readHTML(File path){
-        String returnString = "";
+        StringBuilder returnString = new StringBuilder();
 
         try{
             //read in the html
             scanner = new Scanner(path);
-            while (scanner.hasNextLine()) returnString += scanner.nextLine() + "\n";
+            while (scanner.hasNextLine()) returnString.append(scanner.nextLine()).append("\n");
         }
         catch (FileNotFoundException fnfe){fnfe.printStackTrace();}
 
-        return returnString;
+        return returnString.toString();
     }
 
     private HTMLFile[] getProject(File[] listOfFiles){
@@ -76,6 +66,7 @@ public class HTMLReader implements Runnable{
 
                 //expand temp and tak on the end
                 index = listOfFiles.length;
+                assert temp != null; //TODO learn more
                 for (File aTemp : temp) {
                     listOfFiles = Arrays.copyOf(listOfFiles, listOfFiles.length + 1);
                     listOfFiles[index++] = aTemp;
@@ -97,10 +88,10 @@ public class HTMLReader implements Runnable{
         temp = listOfFiles;
         listOfFiles = new File[0];
         index = 0;
-        for (int i = 0; i < temp.length; i++){
-            if (temp[i] != null){
+        for (File aTemp : temp) {
+            if (aTemp != null) {
                 listOfFiles = Arrays.copyOf(listOfFiles, listOfFiles.length + 1);
-                listOfFiles[index++] = temp[i];
+                listOfFiles[index++] = aTemp;
             }
         }
 
@@ -117,8 +108,7 @@ public class HTMLReader implements Runnable{
 
         boolean homePage;
         for (int i = 0; i < htmlFiles.length; i++) {
-            if (listOfFiles[i].getAbsolutePath().equals(pathHTML.getAbsolutePath() + "/index.html")) homePage = true;
-            else homePage = false;
+            homePage = listOfFiles[i].getAbsolutePath().equals(pathHTML.getAbsolutePath() + "/index.html");
             htmlFiles[i] = new HTMLFile(readHTML(listOfFiles[i]), listOfFiles[i],
                     depth[i], listOfFiles[i].getParentFile().getAbsolutePath().replace(pathHTML.getAbsolutePath(), "").replace("/", ""),
                     homePage);
@@ -132,6 +122,7 @@ public class HTMLReader implements Runnable{
     //for getting header or footer
     private HTMLFile[] getPartialHTML(File navPath){
         File[] listOfFiles = navPath.listFiles();
+        assert listOfFiles != null;//TODO learn more
         HTMLFile[] html = new HTMLFile[listOfFiles.length];
 
         for (int i = 0; i < listOfFiles.length; i++){
@@ -147,34 +138,27 @@ public class HTMLReader implements Runnable{
         HTMLFile[] htmlFiles = getProject(pathHTML.listFiles()); //all chosen html files
         HTMLFile[] nav = getPartialHTML(navHTML), footer = getPartialHTML(footerHTML); //nav and footer html file
 
-        for (int i = 0; i < htmlFiles.length; i++){
-            String[] lines = htmlFiles[i].getHtml().split("\n"); //turn into array to null indices that are in the nav or footer if it exists
+        for (HTMLFile htmlFile : htmlFiles) {
+            String[] lines = htmlFile.getHtml().split("\n"); //turn into array to null indices that are in the nav or footer if it exists
 
             int j = 0;
             //removes nav if it exists
-            for (; j < lines.length; j++){
-                if (lines[j].contains("<!--nav-->")){
+            for (; j < lines.length; j++) {
+                if (lines[j].contains("<!--nav-->")) {
                     j++;
-                    while (!lines[j].contains("<!--/nav-->")){
-                        lines[j++] = null;
-                    }
-                    //lines[j++] = null; //catches the last line the while loop doesn't get
+                    while (!lines[j].contains("<!--/nav-->")) lines[j++] = null;
                     break;
-                }
-                else if (lines[j].contains("<!--footer-->")){ //in case the nav doesn't exist, but the footer does
+                } else if (lines[j].contains("<!--footer-->")) { //in case the nav doesn't exist, but the footer does
                     j--;
                     break;
                 }
             }
 
             //removes footer if it exists
-            for (; j < lines.length; j++){
-                if (lines[j].contains("<!--footer-->")){
+            for (; j < lines.length; j++) {
+                if (lines[j].contains("<!--footer-->")) {
                     j++;
-                    while (!lines[j].contains("<!--/footer-->")){
-                        lines[j++] = null;
-                    }
-                    //lines[j++] = null; //catches the last line the while loop doesn't get
+                    while (!lines[j].contains("<!--/footer-->")) lines[j++] = null;
                     break;
                 }
             }
@@ -183,67 +167,64 @@ public class HTMLReader implements Runnable{
             String[] temp = lines;
             lines = new String[0];
             int index = 0;
-            for (int k = 0; k < temp.length; k++){
-                if (temp[k] != null){
+            for (String aTemp : temp) {
+                if (aTemp != null) {
                     lines = Arrays.copyOf(lines, lines.length + 1);
-                    lines[index++] = temp[k];
+                    lines[index++] = aTemp;
                 }
             }
 
 
-
             //add the nav and footer
-            String compiled = "", navString = "", footerString = "";
-            int depth = htmlFiles[i].getDepth();
-            for (int k = 0; k < nav.length && k < footer.length; k++){ //make sure there are an equal number of files
-                if (nav[k].getDepth() == depth) navString = nav[k].getHtml();
+            StringBuilder compiled = new StringBuilder();StringBuilder navString = new StringBuilder();
+            String footerString = "";
+            int depth = htmlFile.getDepth();
+            for (int k = 0; k < nav.length && k < footer.length; k++) { //make sure there are an equal number of files
+                if (nav[k].getDepth() == depth) navString = new StringBuilder(nav[k].getHtml());
                 if (footer[k].getDepth() == depth) footerString = footer[k].getHtml();
             }
 
             //optional .currentPage in nav
-            String currentPage = "";
-            if (htmlFiles[i].getDepth() == 1) currentPage += "/" + htmlFiles[i].getCurrentPage();
+            StringBuilder currentPage = new StringBuilder();
+            if (htmlFile.getDepth() == 1) currentPage.append("/").append(htmlFile.getCurrentPage());
             else {
-                for (int k = 1; k < htmlFiles[i].getDepth(); k++) currentPage += "../";
-                currentPage += htmlFiles[i].getCurrentPage();
+                for (int k = 1; k < htmlFile.getDepth(); k++) currentPage.append("../");
+                currentPage.append(htmlFile.getCurrentPage());
             }
 
-            scanner = new Scanner(navString);
-            navString = "";
-            while (scanner.hasNextLine()){
+            scanner = new Scanner(navString.toString());
+            navString = new StringBuilder();
+            while (scanner.hasNextLine()) {
                 String currentLine = scanner.nextLine();
-                if (currentPage.equals("/")){ //catches all files in the root directory, like index, 404, etc.
+                if (currentPage.toString().equals("/")) { //catches all files in the root directory, like index, 404, etc.
                     //hopefully a condition that can only be met on the home page
-                    if (currentLine.contains("<p><a href=\"/\"></a></p>") && currentLine.toLowerCase().contains("home") && htmlFiles[i].isHomePage()){
+                    if (currentLine.contains("<p><a href=\"/\"></a></p>") && currentLine.toLowerCase().contains("home") && htmlFile.isHomePage()) {
                         StringBuilder sb = new StringBuilder(currentLine);
                         int position = sb.indexOf("<a");
                         sb.insert(position + 2, " class=\"currentPage\"");
                         currentLine = sb.toString();
                     }
 
-                }
-                else if (currentLine.contains(currentPage)){
+                } else if (currentLine.contains(currentPage.toString())) {
                     StringBuilder sb = new StringBuilder(currentLine);
                     int position = sb.indexOf("<a");
                     sb.insert(position + 2, " class=\"currentPage\"");
                     currentLine = sb.toString();
                 }
-                navString += currentLine + "\n";
+                navString.append(currentLine).append("\n");
             }
 
-            for (int k = 0; k < lines.length; k++){
-                compiled += lines[k] + "\n";
-                if (lines[k].contains("<!--nav-->")) compiled += navString;
-                if (lines[k].contains("<!--footer-->")) compiled += footerString;
+            for (String line : lines) {
+                compiled.append(line).append("\n");
+                if (line.contains("<!--nav-->")) compiled.append(navString);
+                if (line.contains("<!--footer-->")) compiled.append(footerString);
             }
-            htmlFiles[i].appendHtml(compiled);
+            htmlFile.appendHtml(compiled.toString());
         }
         return htmlFiles;
     }
 
-    public boolean writeHTML(){
-        boolean success = false;
-
+    private void writeHTML(){
         HTMLFile[] htmlFiles = compileHTML();
         FileWriter fileWriter;
         for (HTMLFile h : htmlFiles) {
@@ -252,21 +233,13 @@ public class HTMLReader implements Runnable{
                 fileWriter.write(h.getHtml());
                 fileWriter.close();
                 if (console != null) {
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            String temp = console.getText() + "\n";
-                            console.setText(temp + h.getFile());
-                        }
+                    Platform.runLater(() -> {
+                        String temp = console.getText() + "\n";
+                        console.setText(temp + h.getFile());
                     });
                 }
             } catch (IOException e) {e.printStackTrace();}
         }
-
-
-
-
-        return success;
     }
 
     @Override
