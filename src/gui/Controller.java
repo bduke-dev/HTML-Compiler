@@ -116,7 +116,7 @@ public class Controller {
         }
     }
 
-    public void getIgnoreFile(){ //TODO attach to cdoe
+    public void getIgnoreFile(){
         try {
             fileChooser.setTitle("Choose Ignore File");
             fileChooser.setInitialDirectory(defaultDirectory);
@@ -185,7 +185,7 @@ public class Controller {
         }
 
         String data = navHTML.getAbsolutePath() + "\n" + footerHTML.getAbsolutePath()
-                + "\n" + pathHTML.getAbsolutePath() + "\n" + ignoreFile.getAbsolutePath() //TODO change to ignore file arraylist
+                + "\n" + pathHTML.getAbsolutePath() + "\n" + ignoreFile.getAbsolutePath()
                 + "\n" + useIgnoreFile + "\n" + useInsertClass;
 
         if (useIgnoreFile) data += "\n" + ignoreString;
@@ -208,7 +208,7 @@ public class Controller {
 
         setOutput(loadFile, "Load File");
 
-        try {//TODO get ignore string from file and put it in the array list
+        try {
             scanner = new Scanner(loadFile);
             String settings = "";
             while (scanner.hasNextLine()) settings += scanner.nextLine() + "\n";
@@ -223,9 +223,8 @@ public class Controller {
             try {
                 String[] s = settingsSplit[6].split(",");
                 if (useIgnoreFile && s.length > 0) {
-                    System.out.println("READ IN IGNORE");
                     ignore.clear();
-                    ignore.addAll(Arrays.asList(s));
+                    for (String s1 : s) ignore.add(s1.trim());
                 }
             }
             catch (ArrayIndexOutOfBoundsException aiobe){}

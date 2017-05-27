@@ -57,7 +57,6 @@ public class HTMLReader implements Runnable{
         File[] temp;
 
         for (int i = 0; i < listOfFiles.length; i++){
-            //null .git, .sass-cache, css, scss, sass //TODO make so user can specify
             if (listOfFiles[i] != null) {
                 String path = listOfFiles[i].getName();
                 //null ignored files and directories in root project
