@@ -19,14 +19,27 @@ public class HTMLReader implements Runnable{
     private File navHTML, footerHTML, pathHTML;
     private ArrayList<String> ignore;
     private TextArea console;
+    private boolean insertCurrentPage;
     private Scanner scanner;
 
-    public HTMLReader(File navHTML, File footerHTML, File pathHTML, TextArea console, ArrayList<String> ignore){
+
+    public HTMLReader(File navHTML, File footerHTML, File pathHTML, TextArea console, ArrayList<String> ignore, boolean insertCurrentPage){
         this.navHTML = navHTML;
         this.footerHTML = footerHTML;
         this.pathHTML = pathHTML;
         this.console = console;
         this.ignore = ignore;
+        this.insertCurrentPage = insertCurrentPage;
+    }
+
+    //TODO for dev only
+    public HTMLReader(File navHTML, File footerHTML, File pathHTML){
+        this.navHTML = navHTML;
+        this.footerHTML = footerHTML;
+        this.pathHTML = pathHTML;
+        this.console = null;
+        this.ignore = new ArrayList<>(Arrays.asList("partials", ".git", ".sass-cache", "css", "scss", "sass", "DEV FILES", "google071d8247f50df527.html"));
+
     }
 
     private String readHTML(File path){
@@ -185,39 +198,37 @@ public class HTMLReader implements Runnable{
                 if (footer[k].getDepth() == depth) footerString = footer[k].getHtml();
             }
 
-            //optional .currentPage in nav
-            //this gets the name of the current page, including the depth
-            StringBuilder currentPage = new StringBuilder();
-            if (htmlFile.getDepth() == 1) currentPage.append("/").append(htmlFile.getCurrentPage());
-            else {
-                for (int k = 1; k < htmlFile.getDepth(); k++) currentPage.append("../");
-                currentPage.append(htmlFile.getCurrentPage());
-            }
+            if (insertCurrentPage) {
+                //optional .currentPage in nav
+                //this gets the name of the current page, including the depth
+                StringBuilder currentPage = new StringBuilder();
+                if (htmlFile.getDepth() == 1) currentPage.append("/").append(htmlFile.getCurrentPage());
+                else {
+                    for (int k = 1; k < htmlFile.getDepth(); k++) currentPage.append("../");
+                    currentPage.append(htmlFile.getCurrentPage());
+                }
 
-            scanner = new Scanner(navString.toString());
-            navString = new StringBuilder();
-            while (scanner.hasNextLine()) {
-                String currentLine = scanner.nextLine();//TODO for some reason isnt catching 404
-                System.out.println(currentPage.toString());
-                if (currentPage.toString().equals("/")) { //catches all files in the root directory, like index, 404, etc.
-                    System.out.println(htmlFile.isHomePage());
-                    //hopefully a condition that can only be met on the home page
-                    if (currentLine.contains("<p><a href=\"/\"></a></p>") && currentLine.toLowerCase().contains("home") && htmlFile.isHomePage()) {
+                scanner = new Scanner(navString.toString());
+                navString = new StringBuilder();
+                while (scanner.hasNextLine()) {
+                    String currentLine = scanner.nextLine();
+                    if (currentPage.toString().equals("/")) { //catches all files in the root directory, like index, 404, etc.
+                        //hopefully a condition that can only be met on the home page
+                        if (currentLine.contains("<p><a href=\"/\">") && currentLine.toLowerCase().contains("home") && htmlFile.isHomePage()) {
+                            StringBuilder sb = new StringBuilder(currentLine);
+                            int position = sb.indexOf("<a");
+                            sb.insert(position + 2, " class=\"currentPage\"");
+                            currentLine = sb.toString();
+                        }
+                    } else if (currentLine.contains(currentPage.toString())) {
                         StringBuilder sb = new StringBuilder(currentLine);
                         int position = sb.indexOf("<a");
                         sb.insert(position + 2, " class=\"currentPage\"");
                         currentLine = sb.toString();
                     }
+                    navString.append(currentLine).append("\n");
                 }
-                else if (currentLine.contains(currentPage.toString())) {
-                    StringBuilder sb = new StringBuilder(currentLine);
-                    int position = sb.indexOf("<a");
-                    sb.insert(position + 2, " class=\"currentPage\"");
-                    currentLine = sb.toString();
-                }
-                navString.append(currentLine).append("\n");
             }
-
             for (String line : lines) {
                 compiled.append(line).append("\n");
                 if (line.contains("<!--nav-->")) compiled.append(navString);
@@ -228,7 +239,7 @@ public class HTMLReader implements Runnable{
         return htmlFiles;
     }
 
-    private void writeHTML(){
+    public void writeHTML(){
         HTMLFile[] htmlFiles = compileHTML();
         FileWriter fileWriter;
         for (HTMLFile h : htmlFiles) {

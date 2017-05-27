@@ -247,7 +247,7 @@ public class Controller {
     }
 
     public void compile(){
-        HTMLReader htmlReader = new HTMLReader(navHTML, footerHTML, pathHTML, outputLog, ignore);
+        HTMLReader htmlReader = new HTMLReader(navHTML, footerHTML, pathHTML, outputLog, ignore, useInsertClass);
         htmlReader.run();
     }
 
