@@ -307,6 +307,9 @@ public class HTMLReader implements Runnable{
         }
     }
 
+    /**
+     * Overridden run method so that the logic is in its own thread
+     */
     @Override
     public void run() {
         writeHTML();
