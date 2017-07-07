@@ -151,9 +151,13 @@ public class HTMLReader implements Runnable{
         //take the array of files and put them in an array of HTMLFiles
         for (int i = 0; i < htmlFiles.length; i++) {
             homePage = listOfFiles[i].getAbsolutePath().equals(pathHTML.getAbsolutePath() + "/index.html");
-            htmlFiles[i] = new HTMLFile(readHTML(listOfFiles[i]), listOfFiles[i], depth[i],
-                    listOfFiles[i].getParentFile().getAbsolutePath().replace(pathHTML.getAbsolutePath(), "").replace("/", ""),
-                    homePage);
+            String fileName = listOfFiles[i].getAbsolutePath().replace(listOfFiles[i].getParentFile().getAbsolutePath(), "");
+
+            if (fileName.equals("/index.html")) fileName = listOfFiles[i].getParentFile().getAbsolutePath().replace(pathHTML.getAbsolutePath(), "").replace("/", "");
+            else fileName = listOfFiles[i].getAbsolutePath().replace(listOfFiles[i].getParentFile().getAbsolutePath(), "").replace("/", "");
+
+            htmlFiles[i] = new HTMLFile(readHTML(listOfFiles[i]), listOfFiles[i], depth[i], fileName, homePage);
+            System.out.println(fileName + homePage);
         }
         return htmlFiles;
     }
@@ -245,10 +249,12 @@ public class HTMLReader implements Runnable{
                 //this gets the name of the current page, including the depth
                 StringBuilder currentPage = new StringBuilder();
                 if (htmlFile.getDepth() == 1) currentPage.append("/").append(htmlFile.getCurrentPage());
+                else if (htmlFile.getCurrentPage().contains(".html")) currentPage.append(htmlFile.getCurrentPage());
                 else {
                     for (int k = 1; k < htmlFile.getDepth(); k++) currentPage.append("../");
                     currentPage.append(htmlFile.getCurrentPage());
                 }
+                System.out.println("\t" + currentPage);
 
                 scanner = new Scanner(navString.toString());
                 navString = new StringBuilder();
