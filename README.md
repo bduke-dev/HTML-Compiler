@@ -38,7 +38,7 @@ Now both of these files will be ignored, increasing runtime as the css directory
 
 Do note that files that don't end in .html are automatically ignored, for example sitemap.xml doesn't need to be in the ignore file.
 
-## currentPage HTML Class - THIS IS VERY FINICKY
+## currentPage HTML Class - STILL IN DEVELOPMENT
 This is a class I often use myself when doing a web page, on the < a > element of the page the user is on the html class="currentPage" is there so that, that page on the nav it will look different from the rest.
 This different can be anything the developer decides, usually a different color font.
 
