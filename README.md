@@ -38,11 +38,11 @@ Now both of these files will be ignored, increasing runtime as the css directory
 
 Do note that files that don't end in .html are automatically ignored, for example sitemap.xml doesn't need to be in the ignore file.
 
-## currentPage HTML Class
+## currentPage HTML Class - STILL IN DEVELOPMENT
 This is a class I often use myself when doing a web page, on the < a > element of the page the user is on the html class="currentPage" is there so that, that page on the nav it will look different from the rest.
 This different can be anything the developer decides, usually a different color font.
 
-The way the program determines the current page is it looks at a file and finds the name if its containing folder.
+The way the program determines the current page is it gets the file path in the project, which corresponds to its link in the href on a nav.
 After that it then looks in the nav and finds the line that corresponds to that directory and appends the class="currentPage" there.
 
 This is what the html would look like, any page in the calendar folder will have the class="currentPage on this < a > element:
@@ -54,5 +54,5 @@ This is what the html would look like, any page in the calendar folder will have
 It is important to note that for the program to insert the html class the project must be laid out a certain way.
 1. In the root there may be multiple html files, however only the index.html (the homepage) will have the class="currentPage"
 1. After that all other pages that should have the class="currentPage" should be in their own folder
-    1. If a folder has multiple files in it then it will appear as the current page is the index.html
-    1. For example, if there is a directory called join, with multiple html files in it, the currentPage will be join on the nav
+    1. If a folder has multiple files in it, the program may have trouble differentiating the pages.
+    1. I was able to get this working on most of my sites that I've worked on, so check them out for examples
