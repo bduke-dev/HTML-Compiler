@@ -238,7 +238,7 @@ public class HTMLReader implements Runnable{
             int depth = htmlFile.getDepth();
             //make sure there are an equal number of nav and footer files
             //because if there aren't that means the depth is off somewhere or we are missing a file
-            //this was we don't try to compile a file without one of them
+            //this way we don't try to compile a file without one of them
             for (int k = 0; k < nav.length && k < footer.length; k++) {
                 if (nav[k].getDepth() == depth) navString = new StringBuilder(nav[k].getHtml());
                 if (footer[k].getDepth() == depth) footerString = footer[k].getHtml();
@@ -252,7 +252,7 @@ public class HTMLReader implements Runnable{
                 else {
                     for (int k = 1; k < htmlFile.getDepth(); k++) {
                         if (k == 1) currentPage.append("..");
-                        else currentPage.append("../");
+                        else currentPage.insert(0, "../");
                     }
                     currentPage.append(htmlFile.getCurrentPage());
                 }
