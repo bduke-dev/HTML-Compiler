@@ -308,6 +308,9 @@ public class HTMLReader implements Runnable{
      * A method to write compiled html files back to their files
      */
     public void writeHTML(){
+
+        writeToConsole("\nCompiling...\n");
+
         HTMLFile[] htmlFiles = compileHTML();
         FileWriter fileWriter;
         for (HTMLFile h : htmlFiles) {
@@ -315,13 +318,25 @@ public class HTMLReader implements Runnable{
                 fileWriter = new FileWriter(h.getFile().getAbsoluteFile());
                 fileWriter.write(h.getHtml());
                 fileWriter.close();
-                if (console != null) { //output to the console
-                    Platform.runLater(() -> {
-                        String temp = console.getText() + "\n";
-                        console.setText(temp + h.getFile());
-                    });
-                }
+                writeToConsole(h.getFile().toString());
             } catch (IOException e) {e.printStackTrace();}
+        }
+
+        writeToConsole("------------------------------");
+
+    }
+
+    /**
+     * Method to write output to the console
+     *
+     * @param s the string to be written
+     */
+    private void writeToConsole(String s){
+        if (console != null) { //output to the console
+            Platform.runLater(() -> {
+                String temp = console.getText() + "\n";
+                console.setText(temp + s);
+            });
         }
     }
 

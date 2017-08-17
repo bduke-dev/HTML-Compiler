@@ -46,7 +46,7 @@ public class Controller {
      * A method to initialize the GUI
      */
     public void initialize() {
-        outputLog.setText("Choose a directory to start!");
+        outputLog.setText("Choose a directory or load settings to start!");
 
         //disable certain buttons to force user to make choices in order
         footerDirectoryButton.setDisable(true);
